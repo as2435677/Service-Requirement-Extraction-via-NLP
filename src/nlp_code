@@ -113,7 +113,7 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
 
 
 
-pos_tag, dep_parse, tokens = get_pos_dep_token(sentence_group[10])
+pos_tag, dep_parse, tokens = get_pos_dep_token(sentence_group[16])
 for token in tokens:
     if pst.stem(token) in input_relateword_sets:
         input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
