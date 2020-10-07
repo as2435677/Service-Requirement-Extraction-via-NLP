@@ -31,7 +31,9 @@ sentence_group = ["Request1 specifies a request for compositions that receive as
        "Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.",
        "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.",
-       "Given the zip code and the food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code."
+       "Given the zip code and the food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
+       "Given the zip code and the food preference, ServiceA returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
+       "Given a zip code and food preference, findRestaurant will return the name, phone number and address of the restaurant that matches the food preference and is closest to the zip code."
        ]
 
 #input and output keywords sets
@@ -59,6 +61,7 @@ def get_pos_dep_token(sen):
     dep_parse = nlp.dependency_parse(sen)
     tokens = nlp.word_tokenize(sen)
     tokens.insert(0,'ROOT')
+    pos_tag.insert(0,('ROOT', 'ROOT'))
     return pos_tag, dep_parse, tokens
 
 #Find the dependency of a certain word
@@ -72,14 +75,18 @@ def find_keyword_relate_dep(word, dep_parse, tokens):
     return relate_dep
 
 #Recover the compound
-def recover_compound(token_index, dep_parse, tokens):
+def recover_compound(token_index, dep_parse, tokens, pos_tag):
     for dep in dep_parse:
         if dep[0] == 'compound' and (dep[1] == token_index or dep[2] == token_index):
             return tokens[dep[2]] + '_' + tokens[dep[1]]
+        elif pos_tag[token_index-1][1] == 'NN':
+            return tokens[token_index-1] + '_' + tokens[token_index]
+        elif pos_tag[token_index+1][1] == 'NN':
+            return tokens[token_index] + '_' + tokens[token_index+1]
     return tokens[token_index]
 
 #Find conjunction words
-def find_conj_words(token_index, dep_parse, tokens):
+def find_conj_words(token_index, dep_parse, tokens, pos_tag):
     words_index = []
     keywords = []
     words_index.append(token_index)
@@ -88,30 +95,30 @@ def find_conj_words(token_index, dep_parse, tokens):
             words_index.append(dep[2])
     #Recover the compound word
     for index in words_index:
-        keywords.append(recover_compound(index, dep_parse, tokens))
+        keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
     return keywords
 
 #Find the target noun
-def find_noun_components(relate_dep, dep_parse, tokens):
+def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
     keywords  = []
     for target in relate_dep:
         #find the noun that has dependency with key verb
         if target[0] == 'case':
             target_noun_index = target[1]
-            keywords = find_conj_words(target_noun_index, dep_parse, tokens)
+            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
         elif target[0] == 'obj':
             target_noun_index = target[2]
-            keywords = find_conj_words(target_noun_index, dep_parse, tokens)
+            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
     return keywords
 
 
 
-pos_tag, dep_parse, tokens = get_pos_dep_token(sentence_group[14])
+pos_tag, dep_parse, tokens = get_pos_dep_token(sentence_group[10])
 for token in tokens:
     if pst.stem(token) in input_relateword_sets:
         input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        I = find_noun_components(input_relate_dep, dep_parse, tokens)
+        I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
     elif pst.stem(token) in output_relateword_sets:
         output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        O = find_noun_components(output_relate_dep, dep_parse, tokens)
+        O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
 
