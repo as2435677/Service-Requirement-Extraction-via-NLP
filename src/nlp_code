@@ -33,7 +33,8 @@ sentence_group = ["Request1 specifies a request for compositions that receive as
        "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.",
        "Given the zip code and the food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the zip code and the food preference, ServiceA returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
-       "Given a zip code and food preference, findRestaurant will return the name, phone number and address of the restaurant that matches the food preference and is closest to the zip code."
+       "Given a zip code and food preference, findRestaurant will return the name, phone number and address of the restaurant that matches the food preference and is closest to the zip code.",
+       "Given the current location and food preferences, guideRestaurant returns the address of the nearest restaurant and its rank."
        ]
 
 #input and output keywords sets
@@ -49,12 +50,15 @@ output_relateword_sets = [
     "obtain"
     ]
 
+#Announce Service name
+Service_names = []
+
 #Announcement of tuple-based groups
 I = []
 O = []
 P = []
 E = []
-
+                    
 #Get pos_tag, dependency and token
 def get_pos_dep_token(sen):
     pos_tag = nlp.pos_tag(sen)
@@ -63,6 +67,35 @@ def get_pos_dep_token(sen):
     tokens.insert(0,'ROOT')
     pos_tag.insert(0,('ROOT', 'ROOT'))
     return pos_tag, dep_parse, tokens
+
+#Recover Sentence
+def recover_sentence(tokens):
+    sen = ''
+    for token in tokens:
+        if token == 'ROOT':
+            continue
+        sen = sen + ' ' + token
+    return sen
+
+#Replace unique service name with str - Service
+def replace_servicename(tokens, pos_tag):
+    flag = 0
+    for tag in pos_tag:
+        if tag[1] == 'JJ':
+            if tag[0][0].islower():
+                flag = 1
+            for ch in tag[0]:
+                if ch.isupper() and flag == 1:
+                    flag = 0
+                    target_index = tokens.index(tag[0])
+                    if tag[0] in Service_names:
+                        tokens[target_index] = 'Service' + str(Service_names.index(tag[0]))
+                        continue
+                    number_of_service = len(Service_names)
+                    Service_names.append(tokens[target_index])
+                    tokens[target_index] = 'Service' + str(number_of_service)
+    sen = recover_sentence(tokens)
+    return sen
 
 #Find the dependency of a certain word
 def find_keyword_relate_dep(word, dep_parse, tokens):
@@ -109,11 +142,17 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         elif target[0] == 'obj':
             target_noun_index = target[2]
             keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
+        elif target[0] == 'conj':
+            target_noun_index = target[2]
+            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
     return keywords
 
 
+sen = sentence_group[10]
+pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
+sen = replace_servicename(tokens, pos_tag)
+pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 
-pos_tag, dep_parse, tokens = get_pos_dep_token(sentence_group[16])
 for token in tokens:
     if pst.stem(token) in input_relateword_sets:
         input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
@@ -121,4 +160,3 @@ for token in tokens:
     elif pst.stem(token) in output_relateword_sets:
         output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
         O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
-
