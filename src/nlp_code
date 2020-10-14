@@ -10,7 +10,8 @@ from stanfordcorenlp import StanfordCoreNLP
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.stem import PorterStemmer
-
+from operator import is_not
+from functools import partial 
 
 #Tool Announcement
 nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
@@ -71,14 +72,24 @@ def get_pos_dep_token(sen):
 #Recover Sentence
 def recover_sentence(tokens):
     sen = ''
+    #if flag = 1, need to reduce one space
+    flag = 0
     for token in tokens:
         if token == 'ROOT':
             continue
-        sen = sen + ' ' + token
+        elif token == '_':
+            sen = sen + token
+            flag = 1
+        else:
+            if flag == 1:
+                sen = sen + token
+                flag = 0
+                continue
+            sen = sen + ' ' + token
     return sen
 
 #Replace unique service name with str - Service
-def replace_servicename(tokens, pos_tag):
+def modify_sentence(tokens, pos_tag):
     flag = 0
     for tag in pos_tag:
         if tag[1] == 'JJ':
@@ -94,6 +105,8 @@ def replace_servicename(tokens, pos_tag):
                     number_of_service = len(Service_names)
                     Service_names.append(tokens[target_index])
                     tokens[target_index] = 'Service' + str(number_of_service)
+    #replace - to _
+    tokens = ['_' if x == '-' in tokens else x for x in tokens]
     sen = recover_sentence(tokens)
     return sen
 
@@ -122,7 +135,7 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
 def find_conj_words(token_index, dep_parse, tokens, pos_tag):
     words_index = []
     keywords = []
-    words_index.append(token_index)
+    #words_index.append(token_index)
     for dep in dep_parse:
         if dep[0] == 'conj' and dep[1] == token_index:
             words_index.append(dep[2])
@@ -131,6 +144,25 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag):
         keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
     return keywords
 
+#Find comprehensive information of target noun
+def find_of_information(token_index, dep_parse, tokens, pos_tag):
+    target_index = -1
+    keywords = []
+    keywords.append(recover_compound(token_index, dep_parse, tokens, pos_tag))
+    for dep in dep_parse:
+        if dep[0] == 'nmod' and dep[1] == token_index:
+            target_index = dep[2]
+    if target_index == -1:
+        return keywords
+    #Check nmod is related to of condition
+    for dep in dep_parse:
+        if dep[0] == 'case' and dep[1] == target_index and tokens[dep[2]] == 'of':
+            keywords[0] = (tokens[target_index] + "_" + tokens[token_index])
+            keywords.append(find_conj_words(target_index, dep_parse, tokens, pos_tag))
+            return keywords
+    return keywords
+            
+
 #Find the target noun
 def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
     keywords  = []
@@ -138,19 +170,22 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         #find the noun that has dependency with key verb
         if target[0] == 'case':
             target_noun_index = target[1]
+            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
         elif target[0] == 'obj':
             target_noun_index = target[2]
+            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
         elif target[0] == 'conj':
             target_noun_index = target[2]
+            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
     return keywords
 
 
-sen = sentence_group[10]
+sen = sentence_group[11]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
-sen = replace_servicename(tokens, pos_tag)
+sen = modify_sentence(tokens, pos_tag)
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 
 for token in tokens:
@@ -160,3 +195,4 @@ for token in tokens:
     elif pst.stem(token) in output_relateword_sets:
         output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
         O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
+
