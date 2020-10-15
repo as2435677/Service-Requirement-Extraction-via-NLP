@@ -31,11 +31,7 @@ sentence_group = ["Request1 specifies a request for compositions that receive as
        "Given the hotel name, city, and state information, findHotel returns the address and zip code of the hotel.",
        "Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.",
-       "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.",
-       "Given the zip code and the food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
-       "Given the zip code and the food preference, ServiceA returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
-       "Given a zip code and food preference, findRestaurant will return the name, phone number and address of the restaurant that matches the food preference and is closest to the zip code.",
-       "Given the current location and food preferences, guideRestaurant returns the address of the nearest restaurant and its rank."
+       "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address."
        ]
 
 #input and output keywords sets
@@ -141,7 +137,8 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag):
             words_index.append(dep[2])
     #Recover the compound word
     for index in words_index:
-        keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
+        #keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
+        keywords.append(find_of_information(index, dep_parse, tokens, pos_tag))
     return keywords
 
 #Find comprehensive information of target noun
@@ -157,7 +154,7 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag):
     #Check nmod is related to of condition
     for dep in dep_parse:
         if dep[0] == 'case' and dep[1] == target_index and tokens[dep[2]] == 'of':
-            keywords[0] = (tokens[target_index] + "_" + tokens[token_index])
+            keywords[0] = (recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + keywords[0])
             keywords.append(find_conj_words(target_index, dep_parse, tokens, pos_tag))
             return keywords
     return keywords
@@ -183,7 +180,7 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
     return keywords
 
 
-sen = sentence_group[11]
+sen = sentence_group[0]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
