@@ -128,36 +128,36 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
     return tokens[token_index]
 
 #Find conjunction words
-def find_conj_words(token_index, dep_parse, tokens, pos_tag):
+def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
     words_index = []
-    keywords = []
-    #words_index.append(token_index)
+    words_index.append(token_index)
     for dep in dep_parse:
         if dep[0] == 'conj' and dep[1] == token_index:
             words_index.append(dep[2])
     #Recover the compound word
     for index in words_index:
         #keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
-        keywords.append(find_of_information(index, dep_parse, tokens, pos_tag))
-    return keywords
+        find_of_information(index, dep_parse, tokens, pos_tag, keywords)
+    
 
 #Find comprehensive information of target noun
-def find_of_information(token_index, dep_parse, tokens, pos_tag):
+def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     target_index = -1
-    keywords = []
-    keywords.append(recover_compound(token_index, dep_parse, tokens, pos_tag))
+    k = 1
+    extend_word = recover_compound(token_index, dep_parse, tokens, pos_tag)
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
-    if target_index == -1:
-        return keywords
+        elif dep[0] == 'case' and dep[1] == token_index and tokens[dep[2]] == 'of':
+            k = 0
+    if target_index == -1 and k:
+        keywords.append(extend_word)
     #Check nmod is related to of condition
     for dep in dep_parse:
         if dep[0] == 'case' and dep[1] == target_index and tokens[dep[2]] == 'of':
-            keywords[0] = (recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + keywords[0])
-            keywords.append(find_conj_words(target_index, dep_parse, tokens, pos_tag))
-            return keywords
-    return keywords
+            extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + extend_word
+            keywords.append(extend_word)
+            find_conj_words(target_index, dep_parse, tokens, pos_tag, keywords)
             
 
 #Find the target noun
@@ -167,20 +167,20 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         #find the noun that has dependency with key verb
         if target[0] == 'case':
             target_noun_index = target[1]
-            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
-            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
+            #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
         elif target[0] == 'obj':
             target_noun_index = target[2]
-            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
-            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
+            #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
         elif target[0] == 'conj':
             target_noun_index = target[2]
-            keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
-            keywords.append(find_conj_words(target_noun_index, dep_parse, tokens, pos_tag))
+            #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
     return keywords
 
 
-sen = sentence_group[0]
+sen = sentence_group[13]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
@@ -188,8 +188,8 @@ pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 for token in tokens:
     if pst.stem(token) in input_relateword_sets:
         input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
+        I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
     elif pst.stem(token) in output_relateword_sets:
         output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
+        O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
 
