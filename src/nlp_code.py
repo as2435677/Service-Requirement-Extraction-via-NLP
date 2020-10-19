@@ -10,13 +10,14 @@ from stanfordcorenlp import StanfordCoreNLP
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
 from operator import is_not
 from functools import partial 
 
 #Tool Announcement
 nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
 pst = PorterStemmer()
-
+lemmatizer = WordNetLemmatizer()
 #Example sentences
 sentence_group = ["Request1 specifies a request for compositions that receive as input the destCity (the name of a city destination for a trip) and DateTime entities, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
        "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs cost for the specific item.",
@@ -150,6 +151,7 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
             target_index = dep[2]
         elif dep[0] == 'case' and dep[1] == token_index and tokens[dep[2]] == 'of':
             k = 0
+    #print(target_index)
     if target_index == -1 and k:
         keywords.append(extend_word)
     #Check nmod is related to of condition
@@ -180,16 +182,23 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
     return keywords
 
 
-sen = sentence_group[13]
+sen = sentence_group[12]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
-pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
+#sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
+#pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 
-for token in tokens:
-    if pst.stem(token) in input_relateword_sets:
-        input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
-    elif pst.stem(token) in output_relateword_sets:
-        output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-        O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
+#Sentence tokenizer
+sen_token = nltk.sent_tokenize(sen)
+for i in range(len(sen_token)):
+    pos_tag, dep_parse, tokens = get_pos_dep_token(sen_token[i])
+    for token in tokens:
+        if (lemmatizer.lemmatize(token, pos="v")).lower() in input_relateword_sets and pos_tag[tokens.index(token)][1] != 'NNS':
+            input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+            I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+            #I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
+        elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
+            output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+            O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
+            #O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
 
