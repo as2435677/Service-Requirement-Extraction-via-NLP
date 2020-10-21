@@ -87,6 +87,14 @@ def recover_sentence(tokens):
             sen = sen + ' ' + token
     return sen
 
+def de_coreference(sen, tokens):
+    coref_information = nlp.coref(sen)
+    num_of_coref = len(coref_information)
+    for i in range(num_of_coref):
+        #represent_words = coref_information[i][0][3]
+        tokens[coref_information[i][1][1]] = coref_information[i][0][3]
+    return recover_sentence(tokens)
+
 #Replace unique service name with str - Service
 def modify_sentence(tokens, pos_tag):
     flag = 0
@@ -107,8 +115,12 @@ def modify_sentence(tokens, pos_tag):
     #replace - to _
     tokens = ['_' if x == '-' in tokens else x for x in tokens]
     #replace ; to .
-    tokens = ['.' if x == ';' in tokens else x for x in tokens]
+    tokens = ['.' if x == ';' in tokens else x for x in tokens]    
     sen = recover_sentence(tokens)
+    for tag in pos_tag:
+        if tag[1] == 'PRP' or tag[1] == 'PRP$':
+            sen = de_coreference(sen, tokens)
+            break
     return sen
 
 #Find the dependency of a certain word
@@ -208,7 +220,7 @@ def remove_nsubj(relate_dep):
     #print(relate_dep)
     return relate_dep
             
-sen = sentence_group[8]
+sen = sentence_group[13]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
