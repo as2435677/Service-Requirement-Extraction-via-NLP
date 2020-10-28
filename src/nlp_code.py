@@ -20,10 +20,10 @@ nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
 lemmatizer = WordNetLemmatizer()
 #Example sentences
 sentence_group = ["Request1 specifies a request for compositions that receive as input the destCity (the name of a city destination for a trip) and DateTime entities, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
-       "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs cost for the specific item.",
+       "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs costs for the specific item.",
        "Book a Hotel and a Theatre in a city where he will arrive in a given date and from which will depart from in another given date.",
-       "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip). receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
-       "In the scenario the user takes a picture of a barcode of a product and provides his current local position. He wants to obtain the cheapest price offered by a shop close to his position, the GPS coordinates of this shop and a review of the product.",
+       "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip) receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
+       "In the scenario the user takes a picture of a barcode of a product and provides his current local position. He wants to obtain the cheapest price offered by a shop close to his position, the GPS coordinate of this shop and a review of the product.",
        "Overall response time should be less than 200 ms and overall reliability should be more than 90%.",
        "Restricting the overall response time to be less than 50s.",
        "The total price of the composite service execution should be at most $500.",
@@ -88,12 +88,51 @@ def recover_sentence(tokens):
     return sen
 
 def de_coreference(sen, tokens):
+    #print(sen)
     coref_information = nlp.coref(sen)
+    #print(coref_information)
+    target_tokens = tokens.copy()
     num_of_coref = len(coref_information)
+    add_index = 0
     for i in range(num_of_coref):
         #represent_words = coref_information[i][0][3]
-        tokens[coref_information[i][1][1]] = coref_information[i][0][3]
-    return recover_sentence(tokens)
+        for k in range(len(coref_information[i])):
+            if coref_information[i][k][3].lower() == 'he' or coref_information[i][k][3].lower() == 'she':
+                continue
+            period_index = 0
+            period_index_2 = 0
+            if k % 2 == 1:
+                continue
+            if coref_information[i][k+1][0] > 1:
+                indicator = coref_information[i][k+1][0] - 1
+                #period_index = 0
+                for token in tokens:
+                    if token == '.':
+                        indicator = indicator - 1
+                    if indicator == 0:
+                        period_index = tokens.index(token)
+                        break
+            if coref_information[i][k][0] > 1:
+                indicator = coref_information[i][k][0] - 1
+                #period_index = 0
+                for token in tokens:
+                    if token == '.':
+                        indicator = indicator - 1
+                    if indicator == 0:
+                        period_index_2 = tokens.index(token)
+                        break
+            del target_tokens[coref_information[i][k+1][1]+period_index+add_index:coref_information[i][k+1][2]+period_index+add_index]
+            target_index = coref_information[i][k][2]+period_index_2 -  1 + add_index
+            tokens_index = coref_information[i][k][2]+period_index_2 -  1
+            while target_index >= coref_information[i][k][1]+period_index_2+add_index:
+                target_tokens.insert(coref_information[i][k+1][1]+period_index+add_index,tokens[tokens_index])
+                target_index = target_index - 1
+                tokens_index = tokens_index - 1
+            if (coref_information[i][k+1][2] - coref_information[i][k+1][1]) < (coref_information[i][k][2] - coref_information[i][k][1]):
+                #print(add_index)
+                add_index = add_index + (coref_information[i][k][2] - coref_information[i][k][1]) - (coref_information[i][k+1][2] - coref_information[i][k+1][1])
+        #tokens[coref_information[i][1][1]] = coref_information[i][0][3]
+    return recover_sentence(target_tokens)
 
 #Replace unique service name with str - Service
 def modify_sentence(tokens, pos_tag):
@@ -117,10 +156,12 @@ def modify_sentence(tokens, pos_tag):
     #replace ; to .
     tokens = ['.' if x == ';' in tokens else x for x in tokens]    
     sen = recover_sentence(tokens)
+    
     for tag in pos_tag:
         if tag[1] == 'PRP' or tag[1] == 'PRP$':
             sen = de_coreference(sen, tokens)
             break
+    
     return sen
 
 #Find the dependency of a certain word
@@ -184,8 +225,10 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     #Check nmod is related to of condition
     for dep in dep_parse:
         if dep[0] == 'case' and dep[1] == target_index and tokens[dep[2]] == 'of':
-            keywords.remove(extend_word)
-            extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + extend_word
+            #print(extend_word)
+            #keywords.remove(extend_word)
+            previous_words = keywords.pop()
+            extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
             keywords.append(extend_word)
             find_conj_words(target_index, dep_parse, tokens, pos_tag, keywords)
             
@@ -204,6 +247,8 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
             #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
         elif target[0] == 'conj':
+            if pos_tag[target[1]][1] == 'VBZ' and pos_tag[target[2]][1] == 'VBZ':
+                continue
             target_noun_index = target[2]
             #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
@@ -219,8 +264,30 @@ def remove_nsubj(relate_dep):
             relate_dep.remove(dep)
     #print(relate_dep)
     return relate_dep
+
+def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
+    words_index = []
+    conj_index = []
+    words_index.append(token_index)
+    list_len = 1
+    index = 0
+    for dep in dep_parse:
+        if dep[0] == 'conj':
+            conj_index.append(dep)
+    while list_len != index:
+        target_index = words_index[index]
+        for dep in conj_index:
+            if dep[1] == target_index and pos_tag[dep[2]][1] == 'VBZ':
+                words_index.append(dep[2])
+            elif dep[2] == target_index and pos_tag[dep[1]][1] == 'VBZ':
+                words_index.append(dep[1])
+            conj_index.remove(dep)
+        index = index + 1
+        list_len = len(words_index)
+    return words_index
             
-sen = sentence_group[13]
+
+sen = sentence_group[8]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
@@ -233,15 +300,27 @@ for i in range(len(sen_token)):
     for token in tokens:
         if (lemmatizer.lemmatize(token, pos="v")).lower() in input_relateword_sets and pos_tag[tokens.index(token)][1] != 'NNS':
             input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-            if pos_tag[tokens.index(token)][1] == 'VBZ' or pos_tag[tokens.index(token)][1] == 'VBP':
-                input_relate_dep = remove_nsubj(input_relate_dep)
-            #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
-            I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
+            i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
+            for index in i_verb_list:
+                input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
+                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP':
+                    input_relate_dep = remove_nsubj(input_relate_dep)
+                #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+                I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
         elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
             output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+            '''
             if pos_tag[tokens.index(token)][1] == 'VBZ' or pos_tag[tokens.index(token)][1] == 'VBP':
                 output_relate_dep = remove_nsubj(output_relate_dep)
             #O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
             O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
+            '''
+            o_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
+            for index in o_verb_list:
+                output_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
+                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP':
+                    output_relate_dep = remove_nsubj(output_relate_dep)
+                #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+                O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
 nlp.close()
 
