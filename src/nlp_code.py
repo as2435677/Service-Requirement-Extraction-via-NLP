@@ -22,17 +22,18 @@ lemmatizer = WordNetLemmatizer()
 sentence_group = ["Request1 specifies a request for compositions that receive as input the destCity (the name of a city destination for a trip) and DateTime entities, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
        "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs costs for the specific item.",
        "Book a Hotel and a Theatre in a city where he will arrive in a given date and from which will depart from in another given date.",
-       "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip) receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
+       "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip). receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
        "In the scenario the user takes a picture of a barcode of a product and provides his current local position. He wants to obtain the cheapest price offered by a shop close to his position, the GPS coordinate of this shop and a review of the product.",
        "Overall response time should be less than 200 ms and overall reliability should be more than 90%.",
        "Restricting the overall response time to be less than 50s.",
        "The total price of the composite service execution should be at most $500.",
-       "Sa returns the blood pressure (BP) of a patient given his PatientID (PID) and DeviceAddress (Add); Sb and Sb2 return respectively the supervisor (Person) and a physician of an organisation (Org); Sc returns a Warning level (WL) given a blood pressure; Sd returns the Emergency department given a level of Warning; Se returns the Organization given a Warning level.",
+       "Sa returns the blood pressure (BP) of a patient given his PatientID (PID) and DeviceAddress (Add); Sb and Sb2 will return respectively the supervisor (Person) and a physician of an organisation (Org); Sc returns a Warning level (WL) given a blood pressure; Sd returns the Emergency department given a level of Warning; Se returns the Organization given a Warning level.",
        "PatientByIDService takes as input a patient ID to return the patient’s description. CurrentTreatmentByPatientIDService takes a patient ID to return the patient’s current treatment. MedicalHistoryByPatientIDService takes a patient ID to return the patient’s previous treatments. MedicationByTreatmentIDService takes a treatment ID to return the medication involved in this treatment. DrugclassByMedicaionService takes a medication ID to return the drug class of this medication (indicates the different risks to be associated to the medication).",
        "Given the hotel name, city, and state information, findHotel returns the address and zip code of the hotel.",
        "Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.",
-       "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address."
+       "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.",
+       "Request1 specifies a request for compositions that receives the destCity (the name of a city destination for a trip) and DateTime entities as input, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)"
        ]
 
 #input and output keywords sets
@@ -41,7 +42,8 @@ input_relateword_sets = [
     "given",
     "give",
     "provide",
-    "receive"
+    "receive",
+    "take"
     ]
 
 output_relateword_sets = [
@@ -90,6 +92,7 @@ def recover_sentence(tokens):
 def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
+    #print(coref_information)
     #print(coref_information)
     target_tokens = tokens.copy()
     num_of_coref = len(coref_information)
@@ -156,7 +159,7 @@ def modify_sentence(tokens, pos_tag):
     #replace ; to .
     tokens = ['.' if x == ';' in tokens else x for x in tokens]    
     sen = recover_sentence(tokens)
-    
+    #print(sen)
     for tag in pos_tag:
         if tag[1] == 'PRP' or tag[1] == 'PRP$':
             sen = de_coreference(sen, tokens)
@@ -249,6 +252,8 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         elif target[0] == 'conj':
             if pos_tag[target[1]][1] == 'VBZ' and pos_tag[target[2]][1] == 'VBZ':
                 continue
+            if (((lemmatizer.lemmatize(tokens[target[1]], pos="v")) in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[target[2]], pos="v")) in output_relateword_sets)) or (((lemmatizer.lemmatize(tokens[target[2]], pos="v")) in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[target[1]], pos="v")) in output_relateword_sets)):
+                continue
             target_noun_index = target[2]
             #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
@@ -262,6 +267,16 @@ def remove_nsubj(relate_dep):
     for dep in relate_dep:
         if dep[0] == 'nsubj':
             relate_dep.remove(dep)
+        elif dep[0] == 'case' and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v") in input_relateword_sets) or (lemmatizer.lemmatize(tokens[dep[1]], pos="v") in output_relateword_sets)):
+            relate_dep.remove(dep)
+    #print(relate_dep)
+    return relate_dep
+
+#Remove case exceptions
+def remove_case(relate_dep, tokens):
+    for dep in relate_dep:
+        if dep[0] == 'case' and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v") in input_relateword_sets) or (lemmatizer.lemmatize(tokens[dep[1]], pos="v") in output_relateword_sets)):
+            relate_dep.remove(dep)
     #print(relate_dep)
     return relate_dep
 
@@ -273,6 +288,8 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
     index = 0
     for dep in dep_parse:
         if dep[0] == 'conj':
+            conj_index.append(dep)
+        elif dep[0] == 'xcomp':
             conj_index.append(dep)
     while list_len != index:
         target_index = words_index[index]
@@ -287,7 +304,7 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
     return words_index
             
 
-sen = sentence_group[8]
+sen = sentence_group[9]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
@@ -303,8 +320,11 @@ for i in range(len(sen_token)):
             i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
             for index in i_verb_list:
                 input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
-                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP':
+                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                     input_relate_dep = remove_nsubj(input_relate_dep)
+                if pos_tag[index][1] == 'NN':
+                    continue
+                #input_relate_dep = remove_case(input_relate_dep, tokens)
                 #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
                 I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
         elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
@@ -318,9 +338,12 @@ for i in range(len(sen_token)):
             o_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
             for index in o_verb_list:
                 output_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
-                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP':
+                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                     output_relate_dep = remove_nsubj(output_relate_dep)
+                if pos_tag[index][1] == 'NN':
+                    continue
+                #output_relate_dep = remove_case(output_relate_dep, tokens)
                 #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
                 O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
-nlp.close()
 
+nlp.close()
