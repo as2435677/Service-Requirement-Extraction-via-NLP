@@ -28,7 +28,7 @@ sentence_group = ["Request1 specifies a request for compositions that receive as
        "Restricting the overall response time to be less than 50s.",
        "The total price of the composite service execution should be at most $500.",
        "Sa returns the blood pressure (BP) of a patient given his PatientID (PID) and DeviceAddress (Add); Sb and Sb2 will return respectively the supervisor (Person) and a physician of an organisation (Org); Sc returns a Warning level (WL) given a blood pressure; Sd returns the Emergency department given a level of Warning; Se returns the Organization given a Warning level.",
-       "PatientByIDService takes as input a patient ID to return the patient’s description. CurrentTreatmentByPatientIDService takes a patient ID to return the patient’s current treatment. MedicalHistoryByPatientIDService takes a patient ID to return the patient’s previous treatments. MedicationByTreatmentIDService takes a treatment ID to return the medication involved in this treatment. DrugclassByMedicaionService takes a medication ID to return the drug class of this medication (indicates the different risks to be associated to the medication).",
+       "PatientByIDService takes a patient ID as input to return the patient’s description. CurrentTreatmentByPatientIDService takes a patient ID to return the patient’s current treatment. MedicalHistoryByPatientIDService takes a patient ID to return the patient’s previous treatments. MedicationByTreatmentIDService takes a treatment ID to return the medication involved in this treatment. DrugclassByMedicaionService takes a medication ID to return the drug class of this medication (indicates the different risks to be associated to the medication).",
        "Given the hotel name, city, and state information, findHotel returns the address and zip code of the hotel.",
        "Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.",
@@ -267,8 +267,12 @@ def remove_nsubj(relate_dep):
     for dep in relate_dep:
         if dep[0] == 'nsubj':
             relate_dep.remove(dep)
+        '''
         elif dep[0] == 'case' and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v") in input_relateword_sets) or (lemmatizer.lemmatize(tokens[dep[1]], pos="v") in output_relateword_sets)):
             relate_dep.remove(dep)
+        elif dep[0] == 'xcomp' and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v") in input_relateword_sets) or (lemmatizer.lemmatize(tokens[dep[1]], pos="v") in output_relateword_sets)):
+            relate_dep.remove(dep)
+        '''
     #print(relate_dep)
     return relate_dep
 
@@ -290,6 +294,10 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
         if dep[0] == 'conj':
             conj_index.append(dep)
         elif dep[0] == 'xcomp':
+            if ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in output_relateword_sets):
+                continue
+            elif ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in output_relateword_sets):
+                continue
             conj_index.append(dep)
     while list_len != index:
         target_index = words_index[index]
@@ -302,9 +310,24 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
         index = index + 1
         list_len = len(words_index)
     return words_index
-            
 
-sen = sentence_group[9]
+def check_case_obj(relate_dep):
+    for dep in relate_dep:
+        if dep[0] == 'case' or dep[0] == 'obj' or dep[0] == 'conj' or dep[0] == 'nsubj':
+            return 1
+    return 0
+
+def check_used_conjwords(token_index, tokens, relate_dep):
+    for dep in relate_dep:
+        if dep[0] == 'conj' and dep[2] == token_index:
+            if ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in output_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in output_relateword_sets):
+                return 1
+            elif ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in input_relateword_sets):
+                return 1
+    return 0
+    
+
+sen = sentence_group[14]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
@@ -317,6 +340,8 @@ for i in range(len(sen_token)):
     for token in tokens:
         if (lemmatizer.lemmatize(token, pos="v")).lower() in input_relateword_sets and pos_tag[tokens.index(token)][1] != 'NNS':
             input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+            if check_used_conjwords(tokens.index(token), tokens, dep_parse):
+                continue
             i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
             for index in i_verb_list:
                 input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
@@ -324,11 +349,15 @@ for i in range(len(sen_token)):
                     input_relate_dep = remove_nsubj(input_relate_dep)
                 if pos_tag[index][1] == 'NN':
                     continue
+                if not check_case_obj(input_relate_dep):
+                    continue
                 #input_relate_dep = remove_case(input_relate_dep, tokens)
                 #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
                 I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
         elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
             output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+            if check_used_conjwords(tokens.index(token), tokens, dep_parse):
+                continue
             '''
             if pos_tag[tokens.index(token)][1] == 'VBZ' or pos_tag[tokens.index(token)][1] == 'VBP':
                 output_relate_dep = remove_nsubj(output_relate_dep)
@@ -341,6 +370,8 @@ for i in range(len(sen_token)):
                 if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                     output_relate_dep = remove_nsubj(output_relate_dep)
                 if pos_tag[index][1] == 'NN':
+                    continue
+                if not check_case_obj(output_relate_dep):
                     continue
                 #output_relate_dep = remove_case(output_relate_dep, tokens)
                 #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
