@@ -19,21 +19,20 @@ nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
 #pst = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 #Example sentences
-sentence_group = ["Request1 specifies a request for compositions that receive as input the destCity (the name of a city destination for a trip) and DateTime entities, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
+sentence_group = ["Request1 specifies a request for compositions that receives the destCity (the name of a city destination for a trip) and DateTime entities as input, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
        "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs costs for the specific item.",
-       "Book a Hotel and a Theatre in a city where he will arrive in a given date and from which will depart from in another given date.",
        "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip). receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
        "In the scenario the user takes a picture of a barcode of a product and provides his current local position. He wants to obtain the cheapest price offered by a shop close to his position, the GPS coordinate of this shop and a review of the product.",
-       "Overall response time should be less than 200 ms and overall reliability should be more than 90%.",
-       "Restricting the overall response time to be less than 50s.",
-       "The total price of the composite service execution should be at most $500.",
        "Sa returns the blood pressure (BP) of a patient given his PatientID (PID) and DeviceAddress (Add); Sb and Sb2 will return respectively the supervisor (Person) and a physician of an organisation (Org); Sc returns a Warning level (WL) given a blood pressure; Sd returns the Emergency department given a level of Warning; Se returns the Organization given a Warning level.",
        "PatientByIDService takes a patient ID as input to return the patient’s description. CurrentTreatmentByPatientIDService takes a patient ID to return the patient’s current treatment. MedicalHistoryByPatientIDService takes a patient ID to return the patient’s previous treatments. MedicationByTreatmentIDService takes a treatment ID to return the medication involved in this treatment. DrugclassByMedicaionService takes a medication ID to return the drug class of this medication (indicates the different risks to be associated to the medication).",
        "Given the hotel name, city, and state information, findHotel returns the address and zip code of the hotel.",
        "Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.",
        "Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.",
        "Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.",
-       "Request1 specifies a request for compositions that receives the destCity (the name of a city destination for a trip) and DateTime entities as input, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)"
+       "Book a Hotel and a Theatre in a city where he will arrive in a given date and from which will depart from in another given date.",
+       "Overall response time should be less than 200 ms and overall reliability should be more than 90%.",
+       "Restricting the overall response time to be less than 50s.",
+       "The total price of the composite service execution should be at most $500."
        ]
 
 #input and output keywords sets
@@ -180,12 +179,24 @@ def find_keyword_relate_dep(word, dep_parse, tokens):
 #Recover the compound
 def recover_compound(token_index, dep_parse, tokens, pos_tag):
     for dep in dep_parse:
-        if dep[0] == 'compound' and (dep[1] == token_index or dep[2] == token_index):
-            return tokens[dep[2]] + '_' + tokens[dep[1]]
-        elif pos_tag[token_index-1][1] == 'NN':
-            return tokens[token_index-1] + '_' + tokens[token_index]
-        elif pos_tag[token_index+1][1] == 'NN':
-            return tokens[token_index] + '_' + tokens[token_index+1]
+        ext_word = tokens[token_index]
+        if dep[0] == 'compound' and dep[1] == token_index:
+            ext_word = tokens[dep[2]] + '_' + ext_word
+            i = 0
+            target_index = dep[2]
+            while i < len(dep_parse):
+                #print(dep_parse[i][1])
+                if dep_parse[i][0] == 'compound' and dep_parse[i][1] == target_index:
+                    #print(target_index)
+                    ext_word = tokens[dep_parse[i][2]] + '_' + ext_word
+                    i = 0
+                    target_index = dep_parse[i][2]
+                i = i + 1
+            return ext_word
+    if pos_tag[token_index-1][1] == 'NN':
+        return tokens[token_index-1] + '_' + tokens[token_index]
+    elif pos_tag[token_index+1][1] == 'NN':
+        return tokens[token_index] + '_' + tokens[token_index+1]
     return tokens[token_index]
 
 #Find conjunction words
@@ -220,14 +231,14 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
-        elif dep[0] == 'case' and dep[1] == token_index and tokens[dep[2]] == 'of':
+        elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for'):
             k = 0
     #print(target_index)
     if k:#target_index == -1 and k:
         keywords.append(extend_word)
     #Check nmod is related to of condition
     for dep in dep_parse:
-        if dep[0] == 'case' and dep[1] == target_index and tokens[dep[2]] == 'of':
+        if dep[0] == 'case' and dep[1] == target_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for'):
             #print(extend_word)
             #keywords.remove(extend_word)
             previous_words = keywords.pop()
@@ -327,7 +338,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
     
 
-sen = sentence_group[14]
+sen = sentence_group[9]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
