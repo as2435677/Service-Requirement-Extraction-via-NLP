@@ -263,7 +263,10 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
             #print(extend_word)
             #keywords.remove(extend_word)
             previous_words = keywords.pop()
-            extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+            if tokens[dep[2]] == 'for':
+                extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+            else:
+                extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
             keywords.append(extend_word)
             find_conj_words(target_index, dep_parse, tokens, pos_tag, keywords)
             
@@ -359,7 +362,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
     
 
-sen = sentence_group[3]
+sen = sentence_group[2]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
