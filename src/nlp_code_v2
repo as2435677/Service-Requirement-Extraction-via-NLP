@@ -208,11 +208,15 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
     if pos_tag[token_index-1][1] == 'NN':
         #return tokens[token_index-1] + '_' + tokens[token_index]
         comb_sets.append(token_index-1)
-    #elif pos_tag[token_index+1][1] == 'NN':
+    elif pos_tag[token_index+1][1] == 'NN':
         #return tokens[token_index] + '_' + tokens[token_index+1]
-        #comb_sets.append(token_index-1)
+        #comb_sets.append(token_index)
+        comb_sets.append(token_index+1)
     for k in range(len(comb_sets)):
-        ext_word = tokens[comb_sets[k]] + '_' + ext_word
+        if comb_sets[k] < token_index:
+            ext_word = tokens[comb_sets[k]] + '_' + ext_word
+        else:
+            ext_word = ext_word + '_' + tokens[comb_sets[k]]
     return ext_word
     #return tokens[token_index]
 
@@ -362,7 +366,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
     
 
-sen = sentence_group[2]
+sen = sentence_group[6]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
