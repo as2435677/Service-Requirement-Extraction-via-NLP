@@ -366,7 +366,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
     
 
-sen = sentence_group[6]
+sen = sentence_group[9]
 pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
 sen = modify_sentence(tokens, pos_tag)
 #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
