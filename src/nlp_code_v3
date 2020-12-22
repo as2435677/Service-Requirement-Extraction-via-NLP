@@ -70,7 +70,10 @@ I = []
 O = []
 P = []
 E = []
-                    
+
+I_group = []
+O_group = []
+               
 #Get pos_tag, dependency and token
 def get_pos_dep_token(sen):
     pos_tag = nlp.pos_tag(sen)
@@ -103,47 +106,77 @@ def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
     #print(coref_information)
-    #print(coref_information)
     target_tokens = tokens.copy()
+    #print(target_tokens)
     num_of_coref = len(coref_information)
-    add_index = 0
     for i in range(num_of_coref):
         #represent_words = coref_information[i][0][3]
         for k in range(len(coref_information[i])):
-            if coref_information[i][k][3].lower() == 'he' or coref_information[i][k][3].lower() == 'she':
-                continue
             period_index = 0
-            period_index_2 = 0
-            if k % 2 == 1:
+            if k == 0:
+                def_target_index = 0
+                if coref_information[i][k][0] > 1:
+                    indicator = coref_information[i][k][0] - 1
+                #period_index = 0
+                    for token in tokens:
+                        if token == '.':
+                            indicator = indicator - 1
+                        if indicator == 0:
+                            def_target_index = tokens.index(token)
+                            break
                 continue
-            if coref_information[i][k+1][0] > 1:
-                indicator = coref_information[i][k+1][0] - 1
-                #period_index = 0
-                for token in tokens:
-                    if token == '.':
-                        indicator = indicator - 1
-                    if indicator == 0:
-                        period_index = tokens.index(token)
-                        break
-            if coref_information[i][k][0] > 1:
-                indicator = coref_information[i][k][0] - 1
-                #period_index = 0
-                for token in tokens:
-                    if token == '.':
-                        indicator = indicator - 1
-                    if indicator == 0:
-                        period_index_2 = tokens.index(token)
-                        break
-            del target_tokens[coref_information[i][k+1][1]+period_index+add_index:coref_information[i][k+1][2]+period_index+add_index]
-            target_index = coref_information[i][k][2]+period_index_2 -  1 + add_index
-            tokens_index = coref_information[i][k][2]+period_index_2 -  1
-            while target_index >= coref_information[i][k][1]+period_index_2+add_index:
-                target_tokens.insert(coref_information[i][k+1][1]+period_index+add_index,tokens[tokens_index])
-                target_index = target_index - 1
+            
+            '''
+            indicator = coref_information[i][k][0] - 1
+            #period_index = 0
+            for token in target_tokens:
+                if token == '.':
+                    indicator = indicator - 1
+                if indicator == 0:
+                    period_index = target_tokens.index(token)
+                    break
+            '''
+                
+            indicator2 = coref_information[i][k][0] - 1
+            #period_index = 0
+            for token in tokens:
+                if token == '.':
+                    indicator2 = indicator2 - 1
+                if indicator2 == 0:
+                    period_index_2 = tokens.index(token)
+                    break
+                
+            #print(period_index)
+            #find target_token index
+            nums_words = coref_information[i][k][2] - coref_information[i][k][1]
+            #print(nums_words)
+            flag = 1
+            #print(len(target_tokens))
+            for y in range(len(target_tokens)):
+                #print(y)
+                #print(target_tokens[y])
+                if target_tokens[y] == tokens[coref_information[i][k][1] + period_index_2]:
+                    for x in range(nums_words):
+                        flag = 0
+                        if target_tokens[y + x] != tokens[coref_information[i][k][1] + period_index_2 + x]:
+                            flag = 1
+                            break
+                if flag == 1:
+                    continue
+                else:
+                    target_index = y
+                    break
+            #print(flag)
+            if flag == 1:
+                continue
+            del target_tokens[target_index:target_index + nums_words]
+            #target_index = coref_information[i][k][2] + period_index -  1 + add_index
+            tokens_index = coref_information[i][0][2] + def_target_index -  1
+            while tokens_index >= coref_information[i][0][1]:
+                target_tokens.insert(target_index ,tokens[tokens_index])
+                #target_index = target_index - 1
                 tokens_index = tokens_index - 1
-            if (coref_information[i][k+1][2] - coref_information[i][k+1][1]) < (coref_information[i][k][2] - coref_information[i][k][1]):
-                #print(add_index)
-                add_index = add_index + (coref_information[i][k][2] - coref_information[i][k][1]) - (coref_information[i][k+1][2] - coref_information[i][k+1][1])
+            #add_index = add_index + (coref_information[i][0][2] - coref_information[i][0][1]) - (coref_information[i][k][2] - coref_information[i][k][1])
         #tokens[coref_information[i][1][1]] = coref_information[i][0][3]
     return recover_sentence(target_tokens)
 
@@ -378,9 +411,13 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 
 for sen_index in range(len(sentence_group)):
     sen = sentence_group[sen_index]
+    print(str(sen_index + 1) + "\n ------------------------------------ \n")
+    print(sen + "\n ------------------------------------ \n")
+    #print(sen)
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
+    origin_tokens = tokens.copy()
+    #print(sen_index)
     sen = modify_sentence(tokens, pos_tag)
-    print(sen)
     #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
     #pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     
@@ -428,6 +465,9 @@ for sen_index in range(len(sentence_group)):
                     #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
                     O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
     #os.system("pause")
+    #break
+    I_group.append(I)
+    O_group.append(O)
     I = []
     O = []
 
