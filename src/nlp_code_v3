@@ -123,6 +123,7 @@ def de_coreference(sen, tokens):
                             indicator = indicator - 1
                         if indicator == 0:
                             def_target_index = tokens.index(token)
+                            #print(def_target_index)
                             break
                 continue
             
@@ -144,6 +145,7 @@ def de_coreference(sen, tokens):
                     indicator2 = indicator2 - 1
                 if indicator2 == 0:
                     period_index_2 = tokens.index(token)
+                    #print(period_index_2)
                     break
                 
             #print(period_index)
@@ -172,7 +174,7 @@ def de_coreference(sen, tokens):
             del target_tokens[target_index:target_index + nums_words]
             #target_index = coref_information[i][k][2] + period_index -  1 + add_index
             tokens_index = coref_information[i][0][2] + def_target_index -  1
-            while tokens_index >= coref_information[i][0][1]:
+            while tokens_index >= coref_information[i][0][1] + def_target_index:
                 target_tokens.insert(target_index ,tokens[tokens_index])
                 #target_index = target_index - 1
                 tokens_index = tokens_index - 1
@@ -411,13 +413,13 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 
 for sen_index in range(len(sentence_group)):
     sen = sentence_group[sen_index]
-    print(str(sen_index + 1) + "\n ------------------------------------ \n")
-    print(sen + "\n ------------------------------------ \n")
     #print(sen)
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_tokens = tokens.copy()
     #print(sen_index)
     sen = modify_sentence(tokens, pos_tag)
+    print(str(sen_index + 1) + "\n ------------------------------------ \n")
+    print(sen + "\n ------------------------------------ \n")
     #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
     #pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     
@@ -466,6 +468,7 @@ for sen_index in range(len(sentence_group)):
                     O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
     #os.system("pause")
     #break
+    #input()
     I_group.append(I)
     O_group.append(O)
     I = []
