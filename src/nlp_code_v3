@@ -16,7 +16,7 @@ from functools import partial
 import os
 
 #Tool Announcement
-nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
+nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
 #pst = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 #Example sentences
@@ -37,7 +37,7 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        "The total price of the composite service execution should be at most $500."
        ]
 '''
-dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/"
+dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
 fo = open(dir_path + "sentences", "r+")
 sentence_group = []
 x = fo.readline()
@@ -251,10 +251,10 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
         for k in range(len(comb_sets)):
             ext_word = tokens[comb_sets[k]] + '_' + ext_word
         return ext_word
-    if pos_tag[token_index-1][1] == 'NN':
+    if pos_tag[token_index-1][1] == 'NN' and pos_tag[token_index][1] == 'NN':
         #return tokens[token_index-1] + '_' + tokens[token_index]
         comb_sets.append(token_index-1)
-    elif pos_tag[token_index+1][1] == 'NN':
+    elif pos_tag[token_index+1][1] == 'NN' and pos_tag[token_index][1] == 'NN':
         #return tokens[token_index] + '_' + tokens[token_index+1]
         #comb_sets.append(token_index)
         comb_sets.append(token_index+1)
@@ -276,10 +276,13 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
     for dep in dep_parse:
         if dep[0] == 'conj':
             conj_index.append(dep)
+        elif dep[0] == 'xcomp' and token_index == dep[1] and pos_tag[dep[2]][1] == 'NN':
+            words_index[0] = dep[2]
+            #list_len = len(words_index)
     while list_len != index:
         target_index = words_index[index]
         for dep in conj_index:
-            if dep[1] == target_index:
+            if dep[1] == target_index and pos_tag[dep[1]][1] == pos_tag[dep[2]][1]:
                 words_index.append(dep[2])
         index = index + 1
         list_len = len(words_index)
@@ -298,6 +301,8 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
+        elif dep[0] == 'nmod:poss' and dep[1] == token_index:
+            extend_word = tokens[dep[2]] + tokens[dep[2]+1] + '_' + extend_word
         elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
         '''
@@ -412,7 +417,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[sen_index]
+    sen = sentence_group[21]
     #print(sen)
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_tokens = tokens.copy()
@@ -437,8 +442,8 @@ for sen_index in range(len(sentence_group)):
                     input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
                     if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                         input_relate_dep = remove_nsubj(input_relate_dep)
-                    if pos_tag[index][1] == 'NN':
-                        continue
+                    #if pos_tag[index][1] == 'NN':
+                    #    continue
                     if not check_case_obj(input_relate_dep):
                         continue
                     #input_relate_dep = remove_case(input_relate_dep, tokens)
@@ -459,19 +464,20 @@ for sen_index in range(len(sentence_group)):
                     output_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
                     if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                         output_relate_dep = remove_nsubj(output_relate_dep)
-                    if pos_tag[index][1] == 'NN':
-                        continue
+                    #if pos_tag[index][1] == 'NN':
+                    #    continue
                     if not check_case_obj(output_relate_dep):
                         continue
                     #output_relate_dep = remove_case(output_relate_dep, tokens)
                     #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
                     O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
+        #print(i)
+        #break
     #os.system("pause")
-    #break
     #input()
     I_group.append(I)
     O_group.append(O)
+    break
     I = []
     O = []
-
 nlp.close()
