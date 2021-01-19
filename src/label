@@ -1,0 +1,66 @@
+I = {destCity, DateTime entities} , O = { Name of a theatrefor that city, receipt for the booking performance}
+I = {book title, author, credit card information, address taht the book will be shipped to} , O = {payment from the credit card for the purchase, shipping dates for the specific item, custom costs for the specific item}
+I = {destCity, ArrivalDateTime, departDateTime} , O = {HotelConfirmation, RentalConfirmation}
+I = {picture of a barcode of a product, current local position} , O = {cheapest price offered by a shot close to his position, GPS coordinate of this shop, review of the product}
+I = {PatientID, DeviceAddress; []; blood pressure; level of warning; Warning level} , O = {blood pressure of a patient; supervisor of an organisation, physician of an organisation; warning level; emergency department; organization}
+I = {patient ID; patient ID; patient ID; treatment ID; medication ID} , O = {patient's description; patient's current treatment; patient's previous treatments; medication involved in this treatment; drug class of this medication}
+I = {hotel name, city, state information} , O = {address of the hotel, zip code of the hotel}
+I = {zip code, food preference} , O = {name, phone number, address of the restaurant with matching food preference and closest to the zip code}
+I = {current location, food preference} , O = { address of the closest restaurant, its rating}
+I = {start addresses, destination addresses} , O = {detailed step-by-step driving direction, map image of the destination address}
+I = {node} , O = {k-th ancestor of the given node}
+I = {string input} , O = {length of the longest absolute path}
+I = {string p} , O = {number of different non-empty substrings of p in the string s}
+I = {integer array of digits} , O = {largest multiple of three that can be formed by concatenating some of the given digits in any order }
+I = {sequence of words written in the alien language} , O = {true if and only if the given words are sorted lexicographicaly in this alien language }
+I = {A, B} , O = {the minimum number of swaps to make both sequences strictly increasing}
+I = {integer N} , O = {number of' 1's in the first N number in the magical string S}
+I = {the locations and height of all the buildings} , O = {the skyline formed by these buildings collectively}
+I = {array} , O = {the number of important reverse pairs}
+I = {program} , O = {" foobar " n times}
+I = {employee information of a company, employee id} , O = {total importance value of this employee, all their subordinates}
+I = {string expression representing a Lisp-like expression} , O = {integer value}
+I = {} , O = {number of unique pairs}
+I = {string s} , O = {maximum number of unique substrings that the given string can be split into }
+I = {integer array} , O = {new counts array}
+I = {chemical formula} , O = {count of each atom}
+I = {two positive integers} , O = {number of superpalindromes in the inclusive range}
+I = {array} , O = {root node of this tree}
+I = {Teemo's attacking ascending time series towards Ashe, poisoning time duration per Teemo's attacking} , O = {total time that Ashe is in poisoned condition}
+I = {string s} , O = {number of segments in the string}
+I = {square at location in the grid, color} , O = {final grid}
+I = {list of unique words} , O = {all the pair of the distinct indices}
+I = {equation} , O = {value of x}
+I = {A string S of lowercase English letters} , O = {list of integers representing the size of these parts}
+I = {integer array destination, integer k} , O = {kth lexicographically smallest instructions}
+I = {list of strings} , O = {length of the longest uncommon subsequence}
+I = {input array nums} , O = {its index}
+I = {total nubmer of courses numCourses, list of the prerequisite pairs} , O = {ordering of courses you should take to finish all courses}
+I = {integer array arr, target value target} , O = {integer value, sum of the array gets as close as possible to target}
+I = {node} , O = {copy of the given node}
+I = {list of daily temperatures T} , O = {a list}
+I = {root node of a binary search tree, value} , O = {subtree rooted with that node}
+I = {expression, evaluation map} , O = {list of tokens representing the simplified expression}
+I = {} , O = {rotation index K}
+I = {string s} , O = {sum of countUniqueChars}
+I = {all the cities, flights} , O = {cheapest price from src to dst with up to k stops}
+I = {string arrays queries, words} , O = {integer array answer}
+I = {several projects} , O = {pure profit}
+I = {projects} , O = {final maximized capital}
+I = {parameter} , O = {new reshaped matrix}
+I = {eliminate at most k obstacles} , O = {minimum number of steps to walk from the upper left corner to the lower right corner}
+I = {exactly certain items} , O = {lowest price}
+I = {startTime, endTime, profit arrays} , O = {maximum profit}
+I = {several matchsticks the girl has} , O = {true, false}
+I = {two non-empty linked lists representing two non-negative integers} , O = {the sum as a linked list}
+I = {number N in base-10} , O = {complement of it's binary representation as a base-10 integer}
+I = {list} , O = {the order of the plus sign}
+I = {a string representing n} , O = {smallest good base of n}
+I = {array consisting of n integers} , O = {maximum average value}
+I = {array of integers with possible duplicates} , O = {index of a given target number}
+I = {program} , O = {series}
+I = {root of a Binary Search Tree, target number k} , O = {true, false}
+I = {next click position among all the unrevealed squares} , O = {board after revealing this position according to the following rules}
+I = {expression representing a set of words under the given grammar} , O = {the sorted list of words that the expression represents }
+I = {} , O = {an edge that can be removed so that the resulting graph is a tree of N nodes}
+I = {string s} , O = {MINIMUM change required to make s a strong password}
