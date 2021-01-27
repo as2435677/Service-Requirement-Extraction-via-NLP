@@ -106,7 +106,7 @@ def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
     #return recover_sentence(tokens)
-    #print(coref_information)
+    print(coref_information)
     target_tokens = tokens.copy()
     #print(target_tokens)
     num_of_coref = len(coref_information)
@@ -294,12 +294,21 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
         #keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
         find_of_information(index, dep_parse, tokens, pos_tag, keywords)
     
-
+def Check_Case_in(token_index, dep_parse, tokens):
+    for dep in dep_parse:
+        if dep[0] == 'case' and dep[1] == token_index:
+            if tokens[dep[2]] == 'in':
+                return 1
+            else:
+                return 0
+    return 0
 #Find comprehensive information of target noun
 def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     target_index = -1
     k = 1
+    flag = 0
     extend_word = recover_compound(token_index, dep_parse, tokens, pos_tag)
+    #print(extend_word)
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
@@ -308,8 +317,8 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
         elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
         elif (dep[0] == 'acl' or dep[0] == 'ccomp') and dep[1] == token_index:
-            details_index = dep[2]
             details = ""
+            details_index = dep[2]
             for dep2 in dep_parse:
                 if dep2[0] == 'obj' and dep2[1] == details_index:
                     details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
@@ -317,7 +326,15 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 elif dep2[0] == 'nsubj:pass' and dep2[1] == details_index:
                     details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
                     break
-            extend_word = details + '_' + extend_word
+                elif dep2[0] == 'obl' and dep2[1] == details_index:
+                    if Check_Case_in(dep2[2], dep_parse, tokens):
+                        details = recover_compound(dep2[2], dep_parse, tokens, pos_tag) + '_'
+                        flag = 1
+                        break
+                    else:
+                        break
+            if not flag:
+                extend_word = details + '_' + extend_word
         '''
         elif dep[0] == 'ccomp' and dep[1] == token_index:
             details_index = dep[2]
@@ -345,6 +362,8 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
             previous_words = keywords.pop()
             if tokens[dep[2]] == 'for':
                 extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+            elif flag:
+                extend_word = details + recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
             else:
                 extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
             if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
@@ -450,7 +469,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
     return 0
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[7]
+    sen = sentence_group[8]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
