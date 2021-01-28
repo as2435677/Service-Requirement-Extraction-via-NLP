@@ -470,6 +470,7 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
+    #break
     I = []
     O = []
     if sen_index == 49:

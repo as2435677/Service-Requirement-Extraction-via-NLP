@@ -1,0 +1,4 @@
+destCity, DateTime entities
+book title, auathor, credit card information, address that the book will be shipped
+HotelConfirmation, RentalConfirmation
+picture of barcode of product, current local position
