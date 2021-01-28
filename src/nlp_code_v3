@@ -13,13 +13,15 @@ from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 from operator import is_not
 from functools import partial 
+import os
 
 #Tool Announcement
-nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.1.0')
+nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
 #pst = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 #Example sentences
-sentence_group = ["Request1 specifies a request for compositions that receives the destCity (the name of a city destination for a trip) and DateTime entities as input, and return the Name of a theatre for that city and the receipt for the booking performed (TheatreName, TicketConfirmaton, PlaceNum entities)",
+'''
+sentence_group = ["Request1 specifies a request for compositions that receives the destCity (the name of a city destination for a trip) and DateTime entities as input, and return the Name of a theatre for that city and the receipt for the booking performance (TheatreName, TicketConfirmaton, PlaceNum entities)",
        "The user wishes to provide as inputs a book title and author, credit card information and the address that the book will be shipped to. The outputs of the desired composite service are a payment from the credit card for the purchase, as well as shipping dates and customs costs for the specific item.",
        "Request2 specifies compositions that return HotelConfirmation and RentalConfirmation (the receipt of the booking of a Hotel and a car in city that is the destination for a trip). receiving destCity (the name of the city destination of the trip), ArrivalDateTime (the arrival date), and departDateTime (the departure date) as inputs.",
        "In the scenario the user takes a picture of a barcode of a product and provides his current local position. He wants to obtain the cheapest price offered by a shop close to his position, the GPS coordinate of this shop and a review of the product.",
@@ -34,6 +36,15 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        "Restricting the overall response time to be less than 50s.",
        "The total price of the composite service execution should be at most $500."
        ]
+'''
+dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
+fo = open(dir_path + "sentences", "r+")
+sentence_group = []
+x = fo.readline()
+while(x != ""):
+    sentence_group.append(x)
+    x = fo.readline()
+
 
 #input and output keywords sets
 input_relateword_sets = [
@@ -59,7 +70,10 @@ I = []
 O = []
 P = []
 E = []
-                    
+
+I_group = []
+O_group = []
+               
 #Get pos_tag, dependency and token
 def get_pos_dep_token(sen):
     pos_tag = nlp.pos_tag(sen)
@@ -91,48 +105,81 @@ def recover_sentence(tokens):
 def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
-    #print(coref_information)
+    #return recover_sentence(tokens)
     #print(coref_information)
     target_tokens = tokens.copy()
+    #print(target_tokens)
     num_of_coref = len(coref_information)
-    add_index = 0
     for i in range(num_of_coref):
         #represent_words = coref_information[i][0][3]
         for k in range(len(coref_information[i])):
-            if coref_information[i][k][3].lower() == 'he' or coref_information[i][k][3].lower() == 'she':
-                continue
             period_index = 0
-            period_index_2 = 0
-            if k % 2 == 1:
+            if k == 0:
+                def_target_index = 0
+                if coref_information[i][k][0] > 1:
+                    indicator = coref_information[i][k][0] - 1
+                #period_index = 0
+                    for token in tokens:
+                        if token == '.':
+                            indicator = indicator - 1
+                        if indicator == 0:
+                            def_target_index = tokens.index(token)
+                            #print(def_target_index)
+                            break
                 continue
-            if coref_information[i][k+1][0] > 1:
-                indicator = coref_information[i][k+1][0] - 1
-                #period_index = 0
-                for token in tokens:
-                    if token == '.':
-                        indicator = indicator - 1
-                    if indicator == 0:
-                        period_index = tokens.index(token)
-                        break
-            if coref_information[i][k][0] > 1:
-                indicator = coref_information[i][k][0] - 1
-                #period_index = 0
-                for token in tokens:
-                    if token == '.':
-                        indicator = indicator - 1
-                    if indicator == 0:
-                        period_index_2 = tokens.index(token)
-                        break
-            del target_tokens[coref_information[i][k+1][1]+period_index+add_index:coref_information[i][k+1][2]+period_index+add_index]
-            target_index = coref_information[i][k][2]+period_index_2 -  1 + add_index
-            tokens_index = coref_information[i][k][2]+period_index_2 -  1
-            while target_index >= coref_information[i][k][1]+period_index_2+add_index:
-                target_tokens.insert(coref_information[i][k+1][1]+period_index+add_index,tokens[tokens_index])
-                target_index = target_index - 1
+            
+            '''
+            indicator = coref_information[i][k][0] - 1
+            #period_index = 0
+            for token in target_tokens:
+                if token == '.':
+                    indicator = indicator - 1
+                if indicator == 0:
+                    period_index = target_tokens.index(token)
+                    break
+            '''
+                
+            indicator2 = coref_information[i][k][0] - 1
+            #period_index = 0
+            for token in tokens:
+                if token == '.':
+                    indicator2 = indicator2 - 1
+                if indicator2 == 0:
+                    period_index_2 = tokens.index(token)
+                    #print(period_index_2)
+                    break
+                
+            #print(period_index)
+            #find target_token index
+            nums_words = coref_information[i][k][2] - coref_information[i][k][1]
+            #print(nums_words)
+            flag = 1
+            #print(len(target_tokens))
+            for y in range(len(target_tokens)):
+                #print(y)
+                #print(target_tokens[y])
+                if target_tokens[y] == tokens[coref_information[i][k][1] + period_index_2]:
+                    for x in range(nums_words):
+                        flag = 0
+                        if target_tokens[y + x] != tokens[coref_information[i][k][1] + period_index_2 + x]:
+                            flag = 1
+                            break
+                if flag == 1:
+                    continue
+                else:
+                    target_index = y
+                    break
+            #print(flag)
+            if flag == 1:
+                continue
+            del target_tokens[target_index:target_index + nums_words]
+            #target_index = coref_information[i][k][2] + period_index -  1 + add_index
+            tokens_index = coref_information[i][0][2] + def_target_index -  1
+            while tokens_index >= coref_information[i][0][1] + def_target_index:
+                target_tokens.insert(target_index ,tokens[tokens_index])
+                #target_index = target_index - 1
                 tokens_index = tokens_index - 1
-            if (coref_information[i][k+1][2] - coref_information[i][k+1][1]) < (coref_information[i][k][2] - coref_information[i][k][1]):
-                #print(add_index)
-                add_index = add_index + (coref_information[i][k][2] - coref_information[i][k][1]) - (coref_information[i][k+1][2] - coref_information[i][k+1][1])
+            #add_index = add_index + (coref_information[i][0][2] - coref_information[i][0][1]) - (coref_information[i][k][2] - coref_information[i][k][1])
         #tokens[coref_information[i][1][1]] = coref_information[i][0][3]
     return recover_sentence(target_tokens)
 
@@ -178,41 +225,66 @@ def find_keyword_relate_dep(word, dep_parse, tokens):
 
 #Recover the compound
 def recover_compound(token_index, dep_parse, tokens, pos_tag):
+    comb_sets = []
     for dep in dep_parse:
         ext_word = tokens[token_index]
         if dep[0] == 'compound' and dep[1] == token_index:
-            ext_word = tokens[dep[2]] + '_' + ext_word
+            comb_sets.append(dep[2])
+            #ext_word = tokens[dep[2]] + '_' + ext_word
             i = 0
             target_index = dep[2]
             while i < len(dep_parse):
                 #print(dep_parse[i][1])
                 if dep_parse[i][0] == 'compound' and dep_parse[i][1] == target_index:
                     #print(target_index)
-                    ext_word = tokens[dep_parse[i][2]] + '_' + ext_word
+                    #ext_word = tokens[dep_parse[i][2]] + '_' + ext_word
+                    comb_sets.append(dep_parse[i][2])
                     i = 0
                     target_index = dep_parse[i][2]
                 i = i + 1
-            return ext_word
-    if pos_tag[token_index-1][1] == 'NN':
-        return tokens[token_index-1] + '_' + tokens[token_index]
-    elif pos_tag[token_index+1][1] == 'NN':
-        return tokens[token_index] + '_' + tokens[token_index+1]
-    return tokens[token_index]
+            #return ext_word
+        elif dep[0] == 'amod' and dep[1] == token_index:
+            comb_sets.append(dep[2])
+    comb_sets = sorted(comb_sets, reverse = True)
+    #print("123")
+    #print(comb_sets)
+    if (len(comb_sets) != 0) and ((comb_sets[0] == token_index - 1) or (comb_sets[0] == token_index + 1)):
+        for k in range(len(comb_sets)):
+            ext_word = tokens[comb_sets[k]] + '_' + ext_word
+        return ext_word
+    if pos_tag[token_index-1][1] == 'NN' and pos_tag[token_index][1] == 'NN':
+        #return tokens[token_index-1] + '_' + tokens[token_index]
+        comb_sets.append(token_index-1)
+    elif pos_tag[token_index+1][1] == 'NN' and pos_tag[token_index][1] == 'NN':
+        #return tokens[token_index] + '_' + tokens[token_index+1]
+        #comb_sets.append(token_index)
+        comb_sets.append(token_index+1)
+    for k in range(len(comb_sets)):
+        if comb_sets[k] < token_index:
+            ext_word = tokens[comb_sets[k]] + '_' + ext_word
+        else:
+            ext_word = ext_word + '_' + tokens[comb_sets[k]]
+    return ext_word
+    #return tokens[token_index]
 
 #Find conjunction words
 def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
     words_index = []
     conj_index = []
     words_index.append(token_index)
+    #print(tokens[token_index])
     list_len = 1
     index = 0
     for dep in dep_parse:
         if dep[0] == 'conj':
             conj_index.append(dep)
+        elif dep[0] == 'xcomp' and token_index == dep[1]: #and pos_tag[dep[2]][1] == 'NN':
+            words_index[0] = dep[2]
+            #list_len = len(words_index)
     while list_len != index:
         target_index = words_index[index]
         for dep in conj_index:
-            if dep[1] == target_index:
+            if dep[1] == target_index and (pos_tag[dep[1]][1] == pos_tag[dep[2]][1] or pos_tag[dep[2]][1] == 'NNS'):
                 words_index.append(dep[2])
         index = index + 1
         list_len = len(words_index)
@@ -222,28 +294,81 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
         #keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
         find_of_information(index, dep_parse, tokens, pos_tag, keywords)
     
-
+def Check_Case_in(token_index, dep_parse, tokens):
+    for dep in dep_parse:
+        if dep[0] == 'case' and dep[1] == token_index:
+            if tokens[dep[2]] == 'in':
+                return 1
+            else:
+                return 0
+    return 0
 #Find comprehensive information of target noun
 def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     target_index = -1
     k = 1
+    flag = 0
     extend_word = recover_compound(token_index, dep_parse, tokens, pos_tag)
+    #print(extend_word)
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
-        elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for'):
+        elif dep[0] == 'nmod:poss' and dep[1] == token_index:
+            extend_word = tokens[dep[2]] + tokens[dep[2]+1] + '_' + extend_word
+        elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
+        elif (dep[0] == 'acl' or dep[0] == 'ccomp') and dep[1] == token_index:
+            details = ""
+            details_index = dep[2]
+            for dep2 in dep_parse:
+                if dep2[0] == 'obj' and dep2[1] == details_index:
+                    details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                    break
+                elif dep2[0] == 'nsubj:pass' and dep2[1] == details_index:
+                    details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                    break
+                elif dep2[0] == 'obl' and dep2[1] == details_index:
+                    if Check_Case_in(dep2[2], dep_parse, tokens):
+                        details = recover_compound(dep2[2], dep_parse, tokens, pos_tag) + '_'
+                        flag = 1
+                        break
+                    else:
+                        break
+            if not flag:
+                extend_word = details + '_' + extend_word
+        '''
+        elif dep[0] == 'ccomp' and dep[1] == token_index:
+            details_index = dep[2]
+            details = ""
+            for dep2 in dep_parse:
+                if dep2[0] == 'nsubj:pass' and dep2[1] == details_index:
+                    details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                    break
+            extend_word = details + '_' + extend_word
+        '''
+        '''
+        elif dep[0] == 'amod' and dep[1] == token_index:
+            extend_word = tokens[dep[2]] + '_' + extend_word
+        '''
     #print(target_index)
     if k:#target_index == -1 and k:
-        keywords.append(extend_word)
+        if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
+            keywords.append(extend_word)
+        #keywords.append(extend_word)
     #Check nmod is related to of condition
     for dep in dep_parse:
-        if dep[0] == 'case' and dep[1] == target_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for'):
+        if dep[0] == 'case' and dep[1] == target_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             #print(extend_word)
             #keywords.remove(extend_word)
             previous_words = keywords.pop()
-            extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
-            keywords.append(extend_word)
+            if tokens[dep[2]] == 'for':
+                extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+            elif flag:
+                extend_word = details + recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+            else:
+                extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+            if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
+                keywords.append(extend_word)
+            #keywords.append(extend_word)
             find_conj_words(target_index, dep_parse, tokens, pos_tag, keywords)
             
 
@@ -256,7 +381,7 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
             target_noun_index = target[1]
             #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
-        elif target[0] == 'obj':
+        elif target[0] == 'obj' or target[0] == 'iobj':
             target_noun_index = target[2]
             #keywords.append(find_of_information(target_noun_index, dep_parse, tokens, pos_tag))
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
@@ -271,6 +396,12 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         elif target[0] == 'nsubj':
             target_noun_index = target[1]
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+        elif target[0] == 'mark':
+            target_noun_index = target[1]
+            if lemmatizer.lemmatize(tokens[target_noun_index], pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(tokens[target_noun_index], pos="v").lower() in output_relateword_sets:
+                continue
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+            
     return keywords
 
 #Remove nsubj exceptions
@@ -324,7 +455,7 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
 
 def check_case_obj(relate_dep):
     for dep in relate_dep:
-        if dep[0] == 'case' or dep[0] == 'obj' or dep[0] == 'conj' or dep[0] == 'nsubj':
+        if dep[0] == 'case' or dep[0] == 'obj' or dep[0] == 'conj' or dep[0] == 'nsubj' or dep[0] == 'iobj':
             return 1
     return 0
 
@@ -336,56 +467,81 @@ def check_used_conjwords(token_index, tokens, relate_dep):
             elif ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in input_relateword_sets):
                 return 1
     return 0
+
+for sen_index in range(len(sentence_group)):
+    sen = sentence_group[sen_index]
+    print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
+    pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
+    origin_dep_parse = dep_parse.copy()
+    origin_pos_tag =pos_tag.copy()
+    origin_tokens = tokens.copy()
+    #print(sen_index)
+    sen = modify_sentence(tokens, pos_tag)
+    print(str(sen_index + 1) + "\n ------------------------------------ \n")
+    print(sen + "\n ------------------------------------ \n")
+    #sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
+    #pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     
-
-sen = sentence_group[9]
-pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
-sen = modify_sentence(tokens, pos_tag)
-#sen = " The user wishes to provide as inputs a book title and author , credit card information and the address that the book will be shipped to ."
-#pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
-
-#Sentence tokenizer
-sen_token = nltk.sent_tokenize(sen)
-for i in range(len(sen_token)):
-    pos_tag, dep_parse, tokens = get_pos_dep_token(sen_token[i])
-    for token in tokens:
-        if (lemmatizer.lemmatize(token, pos="v")).lower() in input_relateword_sets and pos_tag[tokens.index(token)][1] != 'NNS':
-            input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-            if check_used_conjwords(tokens.index(token), tokens, dep_parse):
+    #Sentence tokenizer
+    sen_token = nltk.sent_tokenize(sen)
+    for i in range(len(sen_token)):
+        pos_tag, dep_parse, tokens = get_pos_dep_token(sen_token[i])
+        bracket_flag = 0
+        for token in tokens:
+            if token == '(':
+                bracket_flag = 1
+            elif token == ')':
+                bracket_flag = 0
+            if bracket_flag:
                 continue
-            i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
-            for index in i_verb_list:
-                input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
-                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
-                    input_relate_dep = remove_nsubj(input_relate_dep)
-                if pos_tag[index][1] == 'NN':
+            
+            if (lemmatizer.lemmatize(token, pos="v")).lower() in input_relateword_sets and pos_tag[tokens.index(token)][1] != 'NNS':
+                input_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+                if check_used_conjwords(tokens.index(token), tokens, dep_parse):
                     continue
-                if not check_case_obj(input_relate_dep):
+                i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
+                for index in i_verb_list:
+                    input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
+                    if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
+                        input_relate_dep = remove_nsubj(input_relate_dep)
+                    #if pos_tag[index][1] == 'NN':
+                    #    continue
+                    if not check_case_obj(input_relate_dep):
+                        continue
+                    #input_relate_dep = remove_case(input_relate_dep, tokens)
+                    #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+                    I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
+            elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
+                output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
+                if check_used_conjwords(tokens.index(token), tokens, dep_parse):
                     continue
-                #input_relate_dep = remove_case(input_relate_dep, tokens)
-                #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
-                I.append(find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag))
-        elif (lemmatizer.lemmatize(token, pos="v")).lower() in output_relateword_sets:
-            output_relate_dep = find_keyword_relate_dep(token, dep_parse, tokens)
-            if check_used_conjwords(tokens.index(token), tokens, dep_parse):
-                continue
-            '''
-            if pos_tag[tokens.index(token)][1] == 'VBZ' or pos_tag[tokens.index(token)][1] == 'VBP':
-                output_relate_dep = remove_nsubj(output_relate_dep)
-            #O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
-            O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
-            '''
-            o_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
-            for index in o_verb_list:
-                output_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
-                if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
+                '''
+                if pos_tag[tokens.index(token)][1] == 'VBZ' or pos_tag[tokens.index(token)][1] == 'VBP':
                     output_relate_dep = remove_nsubj(output_relate_dep)
-                if pos_tag[index][1] == 'NN':
-                    continue
-                if not check_case_obj(output_relate_dep):
-                    continue
-                #output_relate_dep = remove_case(output_relate_dep, tokens)
-                #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+                #O = find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag)
                 O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
-
+                '''
+                o_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
+                for index in o_verb_list:
+                    output_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
+                    if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
+                        output_relate_dep = remove_nsubj(output_relate_dep)
+                    #if pos_tag[index][1] == 'NN':
+                    #    continue
+                    if not check_case_obj(output_relate_dep):
+                        continue
+                    #output_relate_dep = remove_case(output_relate_dep, tokens)
+                    #I = find_noun_components(input_relate_dep, dep_parse, tokens, pos_tag)
+                    O.append(find_noun_components(output_relate_dep, dep_parse, tokens, pos_tag))
+        #print(i)
+        #break
+    #os.system("pause")
+    #input()
+    I_group.append(I)
+    O_group.append(O)
+    #break
+    if sen_index == 30:
+        break
+    I = []
+    O = []
 nlp.close()
