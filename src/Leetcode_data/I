@@ -2,3 +2,65 @@ destCity, DateTime entities
 book title, auathor, credit card information, address that the book will be shipped
 HotelConfirmation, RentalConfirmation
 picture of barcode of product, current local position
+PatientID, DeviceAddress; Organisation; blood pressure; level of warning; warning level
+patient ID; Patient ID; patient ID; treatment ID; medication ID
+hotel name, city, state information
+zip code, food preference
+current location, food preference
+Start addresses, destination addresses
+node
+string input representing the file system in the explained format
+string p
+integer array of digits
+sequence of words written in the alien language, order of the alphabet
+A, B
+integer N
+locations, height of all the buildings as shown on a cityscape photo
+array
+program
+employee information of a company, employee id
+string expression representing a Lisp-like expression
+two 1s
+string s
+integer array nums
+chemical formula
+two positive integers L and R
+array
+Teemo's attacking ascending time series towards Ashe, poisoning time duration per Teemo's attacking
+string s
+square at location in the grid, color
+list of unique words
+equation
+A string S of lowercase English letters
+integer array destination, integer k
+list of strings
+input array nums
+total number of courses numCourses, list of the prerequisite pairs
+integer array arr, target value target
+node
+list of daily temperatures T
+root node of a binary search tree, value
+expression, evaluation map
+[]
+string s
+all the cities, flights with starting city src and the destination dst
+string arrays queries, words
+several projects
+projects
+parameters
+you can eliminate at most k obstacles
+certain items
+startTime, endTime, profit arrays
+several matchsticks the girl has represented with their stick length
+two non-empty linked lists representing two non-negative integers
+number N in base-10
+list mines
+string representing n
+array consisting of n integers
+array of integers with possible duplicates
+printNumber method, program
+root of a Binary Search Tree, a target number k
+next click position among all the unrevealed squares
+expression representing a set of words under the given grammar
+edge that can be removed so that the resulting graph is a tree of N nodes 
+string s
