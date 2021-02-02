@@ -1,0 +1,66 @@
+ Request1 specifies a request for compositions that receives the destCity ( the name of a city destination for a trip ) and DateTime entities as input , and return the Name of a theatre for that city and the receipt for the booking performance ( TheatreName , TicketConfirmaton , PlaceNum entities )
+ The user wishes to provide a book title and author , credit card information and the address that the book will be shipped to as inputs . The outputs of the desired composite service are a payment from the credit card for the purchase , as well as shipping dates and customs costs for the specific item .
+ Request2 specifies compositions that return HotelConfirmation and RentalConfirmation ( the receipt of the booking of a Hotel and a car in city that is the destination for a trip ) . receiving destCity ( the name of the city destination of the trip ) , ArrivalDateTime ( the arrival date ) , and departDateTime ( the departure date ) as inputs .
+ In the scenario the user takes a picture of a barcode of a product and provides the user current local position . the user wants to obtain the cheapest price offered by a shop close to the user position , the GPS coordinate of a shop and a review of a product .
+ Sa returns the blood pressure ( BP ) of a patient given a patient given his PatientID ( PID ) and DeviceAddress ( Add ) PatientID ( PID ) and DeviceAddress ( Add ) . Sb and Sb2 will return respectively the supervisor ( Person ) and a physician of an organisation ( Org ) . Sc returns a Warning level ( WL ) given a blood pressure . Sd returns the Emergency department given a level of Warning . Se returns the Organization given a Warning level .
+ PatientByIDService takes a patient ID as input to return the patient ’s description . CurrentTreatmentByPatientIDService takes a patient ID to return the patient ’s current treatment . MedicalHistoryByPatientIDService takes a patient ID to return the patient ’s previous treatments . MedicationByTreatmentIDService takes a treatment ID to return the medication involved in this treatment . DrugclassByMedicaionService takes a medication ID to return the drug class of this medication ( indicates the different risks to be associated to the medication ) .
+ Given the hotel name , city , and state information , findHotel returns the address and zip code of the hotel .
+ Given the zip code and food preference , Service0 returns the name , phone number , and address of the restaurant with matching food preference and closest to the zip code .
+ Given the current location and food preference , Service1 returns the address of the closest restaurant and the closest restaurant rating .
+ Given the start and destination addresses , findDirection returns a detailed step_by_step driving direction and a map image of the destination address .
+ Implement the function getKthAncestor ( int node , int k ) to return the k_th ancestor of the given node . If there is no such ancestor , return_1 .
+ Given a string input representing the file system in the explained format , return the length of the longest absolute path to a file in the abstracted file system . If there is no file in the system , return 0 .
+ Now we have another string p . Your job is Your find out another string p non-empty Your of p are present in s . In particular , p input is the string p and you need to output the number of different non-empty substrings of p in the string s .
+ Given an integer array of digits , return the largest multiple of three that can be formed by concatenating some of the given digits in any order .
+ Given a sequence of words written in the alien language , and the order of the alphabet , return true if and only if the given words are sorted lexicographicaly in this alien language .
+ Given A and B , return the minimum number of swaps to make both sequences strictly increasing . It is guaranteed that the given input always makes It possible .
+ Given an integer N as input , return the number of ' 1 's in the first N number in the magical string S .
+ A city 's skyline is the outer contour of the silhouette formed by all the buildings in A city 's when viewed from a distance . Now suppose you are given the locations and height of all the buildings as shown on a cityscape photo ( Figure A ) , write a program to output the skyline formed by all the buildings collectively ( Figure B ) .
+ You need to return the number of important reverse pairs in the given array .
+ The same instance of FooBar will be passed to two different threads . Thread A will call foo ( ) while thread B will call bar ( ) . Modify the given program to output " foobar " n times .
+ Now given the employee information of a company , and an employee id , you need to return the total importance value of an employee id and all their subordinates .
+ You are given a string expression representing a Lisp_like expression to return the integer value of .
+ Although we have two 1s in the input , we should only return the number of unique pairs .
+ Given a string s , return the maximum number of unique substrings that the given string can be split into .
+ You are given an integer array nums and You have to return a new counts array . a new counts array has the property where counts [ i ] is the number of smaller elements to the right of nums [ i ] .
+ Given a chemical formula ( given as a string ) , return the count of each atom .
+ Now , given two positive integers L and R ( represented as strings ) , return the number of superpalindromes in the inclusive range [ L , R ] .
+ Construct the maximum tree by the given array and output the root node of this tree .
+ In LOL world , there is a hero called Teemo and a hero attacking can make a hero enemy Ashe be in poisoned condition . Now , given Teemo attacking ascending time series towards Ashe and the poisoning time duration per Teemo attacking , you need to output the total time that Ashe is in poisoned condition .
+ You are given a string s , return the number of segments in a string s .
+ Given a square at location ( r0 , c0 ) in the grid and a color , color the border of the connected component of that square with the given color , and return the final grid .
+ Given a list of unique words , return all the pairs of the distinct indices ( i , j ) in the given list , so that the concatenation of the two words words [ i ] words [ j ] is a palindrome .
+ Solve a given equation and return the value of operation , the in the form of string " x = #value " . a given equation contains only ' ' , '_' operation , the variable x and its coefficient .
+ A string S of lowercase English letters is given . We want to partition this string into as many parts as possible so that each letter appears in at most one part , and return a list of integers representing the size of these parts .
+ Given an integer array destination and an integer k , return the k th lexicographically smallest instructions that will take Bob to destination .
+ The input will be a list of strings , and the output needs to be the length of the longest uncommon subsequence . If the longest uncommon subsequence does n't exist , return -1 .
+ Given an input array nums , where nums [ i ] ≠ nums [ i 1 ] , find a peak element and return a peak element index .
+ Given the total number of courses numCourses and a list of the prerequisite pairs , return the ordering of courses you should take to finish all courses .
+ Given an integer array arr and a target value target , return the integer value such that when we change all the integers larger than value in the given array to be equal to value , the sum of the given array gets as close as possible ( in absolute difference ) to target .
+ The given node will always be the first node with val = 1 . You must return the copy of The given node as a reference to the cloned graph .
+ Given a list of daily temperatures T , return a list such that , for each day in the input , tells you how many days you would have to wait until a warmer temperature . If there is no future day for which this is possible , put 0 instead .
+ Given You root node of a binary search tree ( BST ) and a value . You need to find the the node 's the BST that the node 's value equals the given value . Return the subtree rooted with that node . If such node does n't exist , you should return NULL .
+ Given an expression such as expression = " e 8_a 5 " and an evaluation map such as { " e " : 1 } ( given in terms of evalvars = [ " e " ] and evalints = [ 1 ] ) , return a list of tokens representing the simplified expression , such as [ "_1 * a " , " 14 " ]
+ Over all possible rotations , return the rotation index K that corresponds to the highest score we could receive . If there are multiple answers , return the smallest such index K.
+ On this problem given a string s we need to return the sum of countUniqueChars ( t ) where t is a substring of s . Notice that some substrings can be repeated so on this case you have to count the repeated ones too .
+ Now given all the cities and flights , together with starting city src and the destination dst , your task is to find the cheapest price from src to dst with up to k stops . If there is no such route , output_1 .
+ Now , given string arrays queries and words , return an integer array answer , where each answer [ i ] is the number of words such that f ( queries [ i ] ) &lt; f ( W ) , where W is a word in words .
+ You are given several projects . For You You You , it You a pure it P You and a minimum capital of C You You needed to start the corresponding project . Initially , you have Service2 capital . When you finish a project , you will obtain its pure profit and the profit will be added to your total capital .
+ To sum up , pick a list of at most k distinct projects from given projects to maximize your final capital , and output your final maximized capital .
+ If the ' reshape ' operation with given parameters is possible and legal , output the new reshaped matrix . Otherwise , output the original matrix .
+ Return the minimum number of steps to walk from the upper left corner ( 0 , 0 ) to the lower right corner ( m_1 , n_1 ) given that you can eliminate at most k obstacles . If it is not possible to find such walk return -1 .
+ The job is to output the lowest price you have to pay for exactly certain items as given , where you could make optimal use of the special offers .
+ You 're given the startTime , endTime and profit arrays , You need to output the maximum profit You can take such that there are no 2 jobs in the subset with overlapping time range .
+ Your input will be several matchsticks the girl has , represented with the girl stick length . Your input will either be true or false , to represent whether Your could make one square using all the matchsticks the girl has .
+ You are given two non-empty linked lists representing two non-negative integers . The digits are stored in reverse order , and each of The digits nodes contains a single digit . Add the two numbers and return the sum as a linked list .
+ For a given number N in base_10 , return the a given number N in base of it 's binary representation as a base_10 integer .
+ In a 2D grid from ( 0 , 0 ) to ( N_1 , N_1 ) , every cell contains a 1 , except those cells in the given list mines which are 0 . What is the largest axis_aligned plus sign of 1 s contained in the grid ? Return the order of the plus sign . If there is none , return 0 .
+ Now given a string representing n , you should return the smallest good base of n in string format .
+ Given an array consisting of n integers , find the contiguous subarray of given length k that has the maximum average value . And you need to output the maximum average value .
+ Given an array of integers with possible duplicates , randomly output the index of a given target number . You can assume that a given target number must exist in the array .
+ Each of the threads is given a printNumber method to output an integer . Modify the given program to output the series 010203040506 ... where the length of the series must be 2 n .
+ Given the root of a Binary Search Tree and a target number k , return true if there exist two elements in the BST such that two elements in the BST such that their sum is equal to the given target sum is equal to the given target .
+ Now given the next click position ( row and column indices ) among all the unrevealed squares ( ' M ' or ' E ' ) , return the board after revealing this position according to the following rules :
+ Given an expression representing a set of words under the given grammar , return the sorted list of words that the expression represents .
+ Return an edge that can be removed so that the resulting graph is a tree of N nodes . If there are multiple answers , return the answer that occurs last in the given 2D_array . The answer edge [ u , v ] should be in the same format , with u &lt; v .
+ Write a function strongPasswordChecker ( s ) , that takes a string s as input , and return the MINIMUM change required to make s a strong password . If s is already strong , return 0 .
