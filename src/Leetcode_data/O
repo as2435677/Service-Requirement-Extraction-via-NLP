@@ -2,3 +2,65 @@ Name of a theatre for that city, receipt for the booking performance
 payment from the credit card for the purchase, shipping dates, customs costs for the specific item
 destCity, ArrivalDateTime, departDateTime
 cheapest price offered by shop close his position, GPS coordinate of this shop, review of product
+blood pressure; supervisor, physician of an organisation; warning level; Emergency department; Organization
+patient's description; patient's current treatment; patient's previous treatments; medication involved in this treatment; drug class of this medication
+address, zip code of the hotel
+name, phone number, address of restaurant with matching food preference and closest to zip code
+address of closest restaurant, the restaurant rating
+detailed step-by-step driving direction, map image of destination address
+k-th ancestor of given node, -1(if)
+length of the longest absolute path to a file in the abstracted file system, 0(if)
+number of different non-empty substrings of p in the string s
+largest multiple of three that can be formed by concatenating some of the given digits in any order
+true(if)
+minimum number of swaps to make both sequences strictly increasing
+number of '1's in the first N number in the magical string S
+skyline formed by these buildings collectively
+number of important reverse pairs
+" foobar " n times 
+total importance value of this employee, subordinates
+integer value of
+number of unique pairs
+maximum number of unique substrings that the given string can be split into
+new counts array
+count of each atom
+number of superpalindromes in the inclusive range
+root node of this tree
+total time that Ashe is in poisoned condition
+number of segments in the string
+final grid
+all the pairs of the distinct indices
+value of x in the form of string
+list of integers representing the size of these parts
+k th lexicographically smallest instructions that will take Bob to destination
+length of the longest uncommon subsequence, -1(if)
+peak element index
+ordering of courses you should take to finish all courses
+integer value
+copy of the given node as a reference to the cloned graph
+list, 0(if)
+subtree rooted with that node, NULL(if)
+list of tokens representing the simplified expression
+rotation index K that corresponds to the highest score we could receive, smallest such index K(if)
+sum of countUniqueChars ( t ) where t is a substring of s
+cheapest price from src to dst with up to k stops
+integer array answer
+project pure profit
+final maximized capital
+new reshaped matrix, original matrix(if)
+minimum number of steps to walk from the upper left corner to the lower right corner, -1(if)
+lowest price you have to pay for exactly certain items
+maximum profit you can take such that there are no 2 jobs in the subset with overlapping time range
+true, false
+sum as a linked list
+complement of it's binary representation as a base-10 integer
+order of the plus sign, 0(if)
+smallest good base of n in string format
+maximum average value
+index of a given target number
+integer, series
+true(if)
+board after revealing this position according to the following rules
+sorted list of words that the expression represents
+answer that occurs last in the given 2D-array
+MINIMUM change required to make s a strong password, 0(if)
