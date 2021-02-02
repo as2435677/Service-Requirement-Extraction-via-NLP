@@ -486,6 +486,7 @@ for sen_index in range(len(sentence_group)):
     output_modisen.writelines(sen)
     output_modisen.write("\n")
 
+
     #Sentence tokenizer
     sen_token = nltk.sent_tokenize(sen)
     for i in range(len(sen_token)):
