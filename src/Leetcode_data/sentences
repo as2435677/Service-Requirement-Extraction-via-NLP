@@ -18,7 +18,7 @@ Given the start and destination addresses, findDirection returns a detailed step
  A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance . Now suppose you are given the locations and height of all the buildings as shown on a cityscape photo ( Figure A ) , write a program to output the skyline formed by these buildings collectively ( Figure B ) .
  You need to return the number of important reverse pairs in the given array .
  The same instance of FooBar will be passed to two different threads . Thread A will call foo ( ) while thread B will call bar ( ) . Modify the given program to output " foobar " n times .
- Now given the employee information of a company , and an employee id , you need to return the total importance value of this employee and all their subordinates .
+ Now given the employee information of a company and an employee id , you need to return the total importance value of this employee and all their subordinates .
  You are given a string expression representing a Lisp-like expression to return the integer value of .
  Although we have two 1s in the input , we should only return the number of unique pairs .
  Given a string s , return the maximum number of unique substrings that the given string can be split into .
@@ -30,7 +30,7 @@ Given the start and destination addresses, findDirection returns a detailed step
  You are given a string s , return the number of segments in the string .
  Given a square at location ( r0 , c0 ) in the grid and a color , color the border of the connected component of that square with the given color , and return the final grid .
  Given a list of unique words , return all the pairs of the distinct indices ( i , j ) in the given list , so that the concatenation of the two words words [ i ] + words [ j ] is a palindrome .
- Solve a given equation and return the value of x in the form of string " x = #value " . The equation contains only' +' ,'-' operation , the variable x and its coefficient .
+ Solve a given equation and return the value of x in the form of string " x = #value " . The equation contains only '+' ,'-' operation , the variable x and its coefficient .
  A string S of lowercase English letters is given . We want to partition this string into as many parts as possible so that each letter appears in at most one part , and return a list of integers representing the size of these parts .
  Given an integer array destination and an integer k , return the k th lexicographically smallest instructions that will take Bob to destination .
  The input will be a list of strings , and the output needs to be the length of the longest uncommon subsequence . If the longest uncommon subsequence doesn't exist , return -1 .
