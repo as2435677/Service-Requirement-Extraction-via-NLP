@@ -8,7 +8,7 @@ Given the hotel name, city, and state information, findHotel returns the address
 Given the zip code and food preference, findRestaurant returns the name, phone number, and address of the restaurant with matching food preference and closest to the zip code.
 Given the current location and food preference, guideRestaurant returns the address of the closest restaurant and its rating.
 Given the start and destination addresses, findDirection returns a detailed step-by-step driving direction and a map image of the destination address.
- Implement the function getKthAncestor ( int node , int k ) to return the k-th ancestor of the given node . If there is no such ancestor , return-1 .
+ Implement the function getKthAncestor ( int node , int k ) to return the k-th ancestor of the given node . If there is no such ancestor , return -1 .
  Given a string input representing the file system in the explained format , return the length of the longest absolute path to a file in the abstracted file system . If there is no file in the system , return 0 .
  Now we have another string p . Your job is to find out how many unique non-empty substrings of p are present in s . In particular , your input is the string p and you need to output the number of different non-empty substrings of p in the string s .
  Given an integer array of digits , return the largest multiple of three that can be formed by concatenating some of the given digits in any order .
@@ -41,9 +41,9 @@ Given the start and destination addresses, findDirection returns a detailed step
  Given a list of daily temperatures T , return a list such that , for each day in the input , tells you how many days you would have to wait until a warmer temperature . If there is no future day for which this is possible , put 0 instead .
  Given the root node of a binary search tree ( BST ) and a value . You need to find the node in the BST that the node's value equals the given value . Return the subtree rooted with that node . If such node doesn't exist , you should return NULL .
  Given an expression such as expression = " e + 8-a + 5 " and an evaluation map such as { " e " : 1 } ( given in terms of evalvars = [ " e " ] and evalints = [ 1 ] ) , return a list of tokens representing the simplified expression , such as [ "-1 * a " , " 14 " ]
- Over all possible rotations , return the rotation index K that corresponds to the highest score we could receive . If there are multiple answers , return the smallest such index K.
+ Over all possible rotations , return the rotation index K that corresponds to the highest score we could receive . If there are multiple answers , return the smallest such index K .
  On this problem given a string s we need to return the sum of countUniqueChars ( t ) where t is a substring of s . Notice that some substrings can be repeated so on this case you have to count the repeated ones too .
- Now given all the cities and flights , together with starting city src and the destination dst , your task is to find the cheapest price from src to dst with up to k stops . If there is no such route , output-1 .
+ Now given all the cities and flights , together with starting city src and the destination dst , your task is to find the cheapest price from src to dst with up to k stops . If there is no such route , output -1 .
  Now , given string arrays queries and words , return an integer array answer , where each answer [ i ] is the number of words such that f ( queries [ i ] ) &lt; f ( W ) , where W is a word in words .
  You are given several projects . For each project i , it has a pure profit P i and a minimum capital of C i is needed to start the corresponding project . Initially , you have W capital . When you finish a project , you will obtain its pure profit and the profit will be added to your total capital .
  To sum up , pick a list of at most k distinct projects from given projects to maximize your final capital , and output your final maximized capital .

@@ -59,7 +59,8 @@ input_relateword_sets = [
 output_relateword_sets = [
     "output",
     "return",
-    "obtain"
+    "obtain",
+    "find"
     ]
 
 #Announce Service name
@@ -117,7 +118,7 @@ def de_coreference(sen, tokens):
         for k in range(len(coref_information[i])):
             #period_index = 0
             if k == 0:
-                if coref_information[i][k][3].lower() == 'your' or coref_information[i][k][3].lower() == 'his' or coref_information[i][k][3].lower() == 'her':
+                if coref_information[i][k][3].lower() == 'your' or coref_information[i][k][3].lower() == 'his' or coref_information[i][k][3].lower() == 'her' or coref_information[i][k][3].lower() == 'you':
                     break
                 def_target_index = 0
                 if coref_information[i][k][0] > 1:
@@ -252,7 +253,7 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
             target_index = dep[2]
             while i < len(dep_parse):
                 #print(dep_parse[i][1])
-                if dep_parse[i][0] == 'compound' and dep_parse[i][1] == target_index:
+                if (dep_parse[i][0] == 'compound' or dep_parse[i][0] == 'amod') and dep_parse[i][1] == target_index:
                     #print(target_index)
                     #ext_word = tokens[dep_parse[i][2]] + '_' + ext_word
                     comb_sets.append(dep_parse[i][2])
@@ -260,7 +261,12 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
                     target_index = dep_parse[i][2]
                 i = i + 1
             #return ext_word
-        elif (dep[0] == 'amod' or dep[0] == 'nummod') and dep[1] == token_index:
+        elif (dep[0] == 'amod' or dep[0] == 'nummod' or dep[0] == 'advmod') and dep[1] == token_index:
+            comb_sets.append(dep[2])
+        elif dep[0] == 'appos'  and dep[1] == token_index:
+            ext_word = ext_word + "_" + tokens[dep[2]]
+            
+        elif dep[0] == 'det' and dep[1] == token_index and (tokens[dep[2]] != 'a' and tokens[dep[2]] != 'an' and tokens[dep[2]] != 'the'):
             comb_sets.append(dep[2])
     comb_sets = sorted(comb_sets, reverse = True)
     #print("123")
@@ -323,19 +329,33 @@ def Check_Case_in(token_index, dep_parse, tokens):
             else:
                 return 0
     return 0
+
+def Check_Case_of(token_index, dep_parse, tokens):
+    for dep in dep_parse:
+        if dep[0] == 'case' and dep[1] == token_index:
+            if tokens[dep[2]] == 'of':
+                return 1
+            else:
+                return 0
+    return 0
+
 #Find comprehensive information of target noun
 def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     target_index = -1
     k = 1
     flag = 0
+    #print(tokens[token_index])
     extend_word = recover_compound(token_index, dep_parse, tokens, pos_tag)
     #print(extend_word)
     #print(extend_word)
     for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             if target_index == -1:
+                #print(dep[2])
                 target_index = dep[2]
-            
+        if dep[0] == 'case' and dep[1] == token_index and pos_tag[dep[2]][1] == 'POS':
+            extend_word = extend_word + '_' + tokens[dep[2]]
+        
         elif dep[0] == 'nmod:poss' and dep[1] == token_index:
             if tokens[dep[2]+1] == "'s":
                 extend_word = tokens[dep[2]] + tokens[dep[2]+1] + '_' + extend_word
@@ -344,6 +364,7 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
         elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
         elif (dep[0] == 'acl' or dep[0] == 'ccomp') and dep[1] == token_index:
+            #print("123")
             details = ""
             details_index = dep[2]
             for dep2 in dep_parse:
@@ -358,6 +379,10 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                         details = recover_compound(dep2[2], dep_parse, tokens, pos_tag) + '_'
                         flag = 1
                         break
+                    elif Check_Case_of(dep2[2], dep_parse, tokens):
+                        #print("123")
+                        details = tokens[details_index] + '_' +  recover_compound(dep2[2], dep_parse, tokens, pos_tag) + '_'
+                        flag = 1
                     else:
                         break
             if not flag:
@@ -379,18 +404,34 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     #print(target_index)
     if k:#target_index == -1 and k:
         if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
-            keywords.append(extend_word)
+            #keywords.append(extend_word)
+            
+            if len(keywords) != 0:
+                if not (extend_word in keywords[-1]):
+                    keywords.append(extend_word)
+            else:        
+                keywords.append(extend_word)
+            
             #print(extend_word)
             #print("I'm right now here")
         #keywords.append(extend_word)
     #Check nmod is related to of condition
     for dep in dep_parse:
-        if dep[0] == 'case' and dep[1] == target_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from' or tokens[dep[2]] == 'towards' or tokens[dep[2]] == 'per'):
+        if dep[0] == 'case' and dep[1] == target_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from' or tokens[dep[2]] == 'towards' or tokens[dep[2]] == 'per' or tokens[dep[2]] == 'at'  or tokens[dep[2]] == 'with'):
             #print(extend_word)
             #keywords.remove(extend_word)
             previous_words = keywords.pop()
             if tokens[dep[2]] == 'for':
                 extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+            elif tokens[dep[2]] == 'at':
+                extend_word = previous_words + '_at_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+                temp = target_index
+                target_index = -1
+                for dep2 in dep_parse:
+                    if dep2[0] == 'conj' and dep2[1] == temp:
+                        target_index = dep2[2]
+                        break
+                del temp
             elif tokens[dep[2]] == 'towards':
                 extend_word = previous_words + '_towards_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
                 temp = target_index
@@ -411,13 +452,23 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 del temp
             elif flag:
                 extend_word = details + recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+                flag = 0
             else:
                 extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
             if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
                 keywords.append(extend_word)
+                
             #keywords.append(extend_word)
             if target_index != -1:
                 find_conj_words(target_index, dep_parse, tokens, pos_tag, keywords)
+                #target_index = -1
+        elif dep[0] == 'case' and target_index == -1 and tokens[dep[2]] == 'for':
+            if not (lemmatizer.lemmatize(extend_word, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(extend_word, pos="v").lower() in output_relateword_sets):
+                keywords.append(extend_word)
+        elif flag:
+            previous_words = keywords.pop()
+            keywords.append(details + previous_words)
+            flag = 0
             
             
 
@@ -445,12 +496,38 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         elif target[0] == 'nsubj':
             target_noun_index = target[1]
             find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+        elif target[0] == 'acl':
+            target_noun_index = target[1]
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+        elif target[0] == 'nsubj:pass':
+            target_noun_index = target[2]
+            if pos_tag[target_noun_index][1] == 'PRP':
+                continue
+            flag = 0
+            for dep2 in dep_parse:
+                if dep2[0] == 'obj' and dep2[1] == target[1]:
+                    flag = 1
+                    break
+            if flag == 1:
+                del flag
+                continue
+            find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+            del flag
         elif target[0] == 'amod':
             target_noun_index = target[1]
             if I == [] and lemmatizer.lemmatize(tokens[target[2]], pos="v").lower() in input_relateword_sets:
-                keywords.append(tokens[target[1]])
+                keywords.append(recover_compound(target[1], dep_parse, tokens, pos_tag))
             elif O == [] and lemmatizer.lemmatize(tokens[target[1]], pos="v").lower() in output_relateword_sets:
-                keywords.append(tokens[target[2]])
+                keywords.append(recover_compound(target[2], dep_parse, tokens, pos_tag))
+        elif target[0] == 'parataxis':
+            target_noun_index = target[1]
+            for dep in dep_parse:
+                if dep[0] == 'obl' and dep[1] == target_noun_index:
+                    target_noun_index = dep[2]
+            if I == [] and lemmatizer.lemmatize(tokens[target[2]], pos="v").lower() in input_relateword_sets:
+                find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
+            elif O == [] and lemmatizer.lemmatize(tokens[target[1]], pos="v").lower() in output_relateword_sets:
+                find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
         elif target[0] == 'mark':
             target_noun_index = target[1]
             if lemmatizer.lemmatize(tokens[target_noun_index], pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(tokens[target_noun_index], pos="v").lower() in output_relateword_sets:
@@ -459,6 +536,8 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
         elif target[0] == 'obl':
             for dep in dep_parse:
                 if (dep[0] == 'obj' or dep[0] == 'obl:tmod') and dep[1] == target[1]:
+                    if target[1] > target[2]:
+                        break
                     target_noun_index = dep[2]
                     find_conj_words(target_noun_index, dep_parse, tokens, pos_tag, keywords)
                 #elif dep[0] == 'obl:tmod' and dep[1] == target[1]
@@ -519,7 +598,7 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
 
 def check_case_obj(relate_dep):
     for dep in relate_dep:
-        if dep[0] == 'case' or dep[0] == 'obj' or dep[0] == 'conj' or dep[0] == 'nsubj' or dep[0] == 'iobj' or dep[0] == 'amod':
+        if dep[0] == 'case' or dep[0] == 'obj' or dep[0] == 'conj' or dep[0] == 'nsubj' or dep[0] == 'iobj' or dep[0] == 'amod' or dep[0] == 'nsubj:pass' or dep[0] == 'parataxis' or dep[0] == 'acl':
             return 1
     return 0
 
@@ -537,7 +616,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[20]
+    sen = sentence_group[60]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
