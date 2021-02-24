@@ -120,6 +120,8 @@ def de_coreference(sen, tokens):
             if k == 0:
                 if coref_information[i][k][3].lower() == 'your' or coref_information[i][k][3].lower() == 'his' or coref_information[i][k][3].lower() == 'her' or coref_information[i][k][3].lower() == 'you':
                     break
+                if 'input' in coref_information[i][k][3].lower():
+                    break
                 def_target_index = 0
                 if coref_information[i][k][0] > 1:
                     indicator = coref_information[i][k][0] - 1
@@ -214,6 +216,22 @@ def modify_sentence(tokens, pos_tag):
     tokens = ['_' if x == '-' in tokens else x for x in tokens]
     #replace ; to .
     tokens = ['.' if x == ';' in tokens else x for x in tokens]    
+    for i in range(len(tokens)):
+        if lemmatizer.lemmatize(tokens[i], pos="v").lower() in output_relateword_sets and i != 0:
+            if tokens[i-1].lower() == 'to':
+                tokens[i] = 'return'
+    sen = recover_sentence(tokens)
+    dep_parse = nlp.dependency_parse(sen)
+    t_index = -1
+    for dep in dep_parse:
+        if dep[0] == 'conj' and lemmatizer.lemmatize(tokens[dep[2]], pos="v").lower() in output_relateword_sets:
+            t_index = dep[1]
+            verb_index = dep[2]
+        elif dep[0] == 'dep' and dep[1] == t_index:
+            tokens[verb_index] = 'return'
+        elif dep[0] == 'dep' and lemmatizer.lemmatize(tokens[dep[2]], pos="v").lower() in output_relateword_sets:
+            tokens[dep[2]] = 'return'
+        
     sen = recover_sentence(tokens)
     mod_token = nlp.word_tokenize(sen)
     mod_token.insert(0,'ROOT')
@@ -306,7 +324,10 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
         elif dep[0] == 'xcomp' and token_index == dep[1]: #and pos_tag[dep[2]][1] == 'NN':
             if pos_tag[dep[2]][1] == 'JJ':
                 continue
-            words_index[0] = dep[2]
+            if len(words_index) != 0:
+                words_index[0] = dep[2]
+            else:
+                words_index.append(dep[2])
             #list_len = len(words_index)
     while list_len != index and words_index != []:
         target_index = words_index[index]
@@ -577,6 +598,10 @@ def find_verb_conj(token_index, dep_parse, tokens, pos_tag):
     index = 0
     for dep in dep_parse:
         if dep[0] == 'conj':
+            if ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in output_relateword_sets):
+                continue
+            elif ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in output_relateword_sets):
+                continue
             conj_index.append(dep)
         elif dep[0] == 'xcomp':
             if ((lemmatizer.lemmatize(tokens[dep[1]], pos="v")).lower() in input_relateword_sets) and ((lemmatizer.lemmatize(tokens[dep[2]], pos="v")).lower() in output_relateword_sets):
@@ -616,7 +641,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[60]
+    sen = sentence_group[sen_index]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
@@ -650,6 +675,8 @@ for sen_index in range(len(sentence_group)):
                     continue
                 i_verb_list = find_verb_conj(tokens.index(token),dep_parse, tokens, pos_tag)
                 for index in i_verb_list:
+                    if tokens[index] == 'input' and tokens[index - 1] == 'as':
+                        continue
                     input_relate_dep = find_keyword_relate_dep(tokens[index], dep_parse, tokens)
                     if pos_tag[index][1] == 'VBZ' or pos_tag[index][1] == 'VBP' or pos_tag[index][1] == 'VB':
                         input_relate_dep = remove_nsubj(input_relate_dep)
@@ -697,7 +724,7 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
-    break
+    #break
     #if sen_index == 30:
     #    break
     I = []
