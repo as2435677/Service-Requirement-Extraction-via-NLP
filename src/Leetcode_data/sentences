@@ -42,7 +42,7 @@ Given the start and destination addresses, findDirection returns a detailed step
  Given the root node of a binary search tree ( BST ) and a value . You need to find the node in the BST that the node's value equals the given value . Return the subtree rooted with that node . If such node doesn't exist , you should return NULL .
  Given an expression such as expression = " e + 8-a + 5 " and an evaluation map such as { " e " : 1 } ( given in terms of evalvars = [ " e " ] and evalints = [ 1 ] ) , return a list of tokens representing the simplified expression , such as [ "-1 * a " , " 14 " ]
  Over all possible rotations , return the rotation index K that corresponds to the highest score we could receive . If there are multiple answers , return the smallest such index K .
- On this problem given a string s we need to return the sum of countUniqueChars ( t ) where t is a substring of s . Notice that some substrings can be repeated so on this case you have to count the repeated ones too .
+ On this problem, given a string s we need to return the sum of countUniqueChars ( t ) where t is a substring of s . Notice that some substrings can be repeated so on this case you have to count the repeated ones too .
  Now given all the cities and flights , together with starting city src and the destination dst , your task is to find the cheapest price from src to dst with up to k stops . If there is no such route , output -1 .
  Now , given string arrays queries and words , return an integer array answer , where each answer [ i ] is the number of words such that f ( queries [ i ] ) &lt; f ( W ) , where W is a word in words .
  You are given several projects . For each project i , it has a pure profit P i and a minimum capital of C i is needed to start the corresponding project . Initially , you have W capital . When you finish a project , you will obtain its pure profit and the profit will be added to your total capital .
@@ -50,7 +50,7 @@ Given the start and destination addresses, findDirection returns a detailed step
  If the' reshape' operation with given parameters is possible and legal , output the new reshaped matrix ; Otherwise , output the original matrix .
  Return the minimum number of steps to walk from the upper left corner ( 0 , 0 ) to the lower right corner ( m-1 , n-1 ) given that you can eliminate at most k obstacles . If it is not possible to find such walk return -1 .
  The job is to output the lowest price you have to pay for exactly certain items as given , where you could make optimal use of the special offers .
- You're given the startTime , endTime and profit arrays , you need to output the maximum profit you can take such that there are no 2 jobs in the subset with overlapping time range .
+ You're given the arrays of startTime , endTime and profit , you need to output the maximum profit you can take such that there are no 2 jobs in the subset with overlapping time range .
  Your input will be several matchsticks the girl has , represented with their stick length . Your output will either be true or false , to represent whether you could make one square using all the matchsticks the little match girl has .
  You are given two non-empty linked lists representing two non-negative integers . The digits are stored in reverse order , and each of their nodes contains a single digit . Add the two numbers and return the sum as a linked list .
  For a given number N in base-10 , return the complement of it's binary representation as a base-10 integer .
