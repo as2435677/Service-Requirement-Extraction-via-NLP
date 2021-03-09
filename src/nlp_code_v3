@@ -261,13 +261,17 @@ def find_keyword_relate_dep(word_index, dep_parse, tokens):
 #Recover the compound
 def recover_compound(token_index, dep_parse, tokens, pos_tag):
     comb_sets = []
+    ext_word = tokens[token_index]
+    pos_flag = 1
     for dep in dep_parse:
-        ext_word = tokens[token_index]
-        if pos_tag[token_index][1] == 'CD' and tokens[token_index+1] == "'s":
+        #ext_word = tokens[token_index]
+        if pos_tag[token_index][1] == 'CD' and tokens[token_index+1] == "'s" and pos_flag:
             if tokens[token_index-1] == "'":
                 ext_word = "'" + ext_word + "'s"
+                pos_flag = 0
             else:
                 ext_word = ext_word + "'s"
+                pos_flag = 0
         
         if dep[0] == 'compound' and dep[1] == token_index:
             comb_sets.append(dep[2])
@@ -286,7 +290,19 @@ def recover_compound(token_index, dep_parse, tokens, pos_tag):
             #return ext_word
         elif (dep[0] == 'amod' or dep[0] == 'nummod' or dep[0] == 'advmod') and dep[1] == token_index:
             comb_sets.append(dep[2])
+            if dep[2] != (len(tokens) - 1):
+                if tokens[dep[2]+1] == 'in':
+                    k = dep[2] + 1
+                    #print("123")
+                    for dep2 in dep_parse:
+                        if dep2[0] == 'case' and dep2[2] == k:
+                            ext_word = tokens[dep2[1]] + "_" + ext_word
+                            #print(ext_word)
+                            break
+                        
         elif dep[0] == 'appos'  and dep[1] == token_index:
+            if tokens[dep[2] - 1] == '(':
+                continue
             ext_word = ext_word + "_" + tokens[dep[2]]
             
         elif dep[0] == 'det' and dep[1] == token_index and (tokens[dep[2]] != 'a' and tokens[dep[2]] != 'an' and tokens[dep[2]] != 'the'):
@@ -371,15 +387,46 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
     k = 1
     flag = 0
     details = ""
+    details2 = ""
     #print(tokens[token_index])
     extend_word = recover_compound(token_index, dep_parse, tokens, pos_tag)
     #print(extend_word)
     #print(extend_word)
     for dep in dep_parse:
+        if dep[0] == 'case' and tokens[token_index + 1] == 'th' and dep[2] == token_index + 1:
+            extend_word = extend_word + '_th_' + recover_compound(dep[1], dep_parse, tokens, pos_tag)
+            break
+        
+    for dep in dep_parse:
         if dep[0] == 'nmod' and dep[1] == token_index:
             if target_index == -1:
                 #print(dep[2])
                 target_index = dep[2]
+                k = target_index + 1
+                if tokens[k] == "'s":
+                    k = k + 1
+                elif tokens[k] == '(':
+                    while tokens[k] != ')':
+                        k = k + 1
+                    k = k + 1
+                if k - 1 != len(tokens) - 1 and (tokens[k] == 'in' or tokens[k] == 'to'):
+                    target2 = -1
+                    for dep2 in dep_parse:
+                        if dep2[0] == 'case' and (dep2[2] == k):
+                            details2 = details2 + '_' + tokens[dep2[2]] + '_' + recover_compound(dep2[1], dep_parse, tokens, pos_tag)
+                            target2 = dep2[1] + 1
+                            if not (target2 != len(tokens) - 1 and (tokens[target2] == 'to' or tokens[target2] == 'in')):
+                                #print(details2)
+                                target2 = -1
+                                break
+                        elif dep2[0] == 'case' and dep2[2] == target2:
+                            #print("test")
+                            details2 = details2 + '_' + tokens[dep2[2]] + '_' + recover_compound(dep2[1], dep_parse, tokens, pos_tag)
+                            target2 = dep2[1] + 1
+                            if not (target2 != len(tokens) - 1 and (tokens[target2] == 'to' or tokens[target2+1] == 'in')):
+                                target2 = -1
+                                break
+                            
         if dep[0] == 'case' and dep[1] == token_index and pos_tag[dep[2]][1] == 'POS':
             extend_word = extend_word + '_' + tokens[dep[2]]
         
@@ -390,14 +437,31 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 extend_word = tokens[dep[2]] + '_' + extend_word
         elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
-        elif (dep[0] == 'acl' or dep[0] == 'ccomp') and dep[1] == token_index:
+        elif (dep[0] == 'acl' or dep[0] == 'ccomp') and (dep[1] == token_index or dep[1] == target_index):
             #print("123")
             #details = ""
             details_index = dep[2]
             for dep2 in dep_parse:
                 if dep2[0] == 'obj' and dep2[1] == details_index:
-                    details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                    temp_relation = find_keyword_relate_dep(dep2[2], dep_parse, tokens)
+                    temp_flag = 0
+                    for relation in temp_relation:
+                        if relation[0] == 'nmod':
+                            details = tokens[details_index] + '_' + recover_compound(relation[2], dep_parse, tokens, pos_tag) + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                            temp_flag = 1
+                    if not temp_flag:
+                        details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
+                    del temp_flag, temp_relation
+                    
+                    if dep2[2] != len(tokens) - 1:
+                        if tokens[dep2[2]+1] == 'in':
+                            for dep3 in dep_parse:
+                                if dep3[0] == 'case' and dep3[2] == dep2[2] + 1:
+                                    details = details + '_in_' + recover_compound(dep3[1], dep_parse, tokens, pos_tag)
+                                    break
+                        
                     break
+                
                 elif dep2[0] == 'nsubj:pass' and dep2[1] == details_index:
                     details = tokens[details_index] + '_' + recover_compound(dep2[2], dep_parse, tokens, pos_tag)
                     break
@@ -414,7 +478,10 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                     else:
                         break
             if not flag:
-                extend_word = details + '_' + extend_word
+                if dep[1] == token_index:
+                    extend_word = details + '_' + extend_word
+                else:
+                    extend_word = extend_word + '_' + details
         '''
         elif dep[0] == 'ccomp' and dep[1] == token_index:
             details_index = dep[2]
@@ -454,6 +521,10 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
             elif tokens[dep[2]] == 'at':
                 extend_word = previous_words + '_at_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
+                if details2 != "":
+                    extend_word = extend_word + details2
+                    details2 = ""
+                
                 temp = target_index
                 target_index = -1
                 for dep2 in dep_parse:
@@ -498,7 +569,9 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 flag = 0
             else:
                 extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
-            
+                if details2 != "":
+                    extend_word = extend_word + details2
+                    details2 = ""
             #if flag:
             #    extend_word = details + "_" + extend_word
             #    flag = 0
@@ -697,7 +770,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[sen_index]
+    sen = sentence_group[44]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
@@ -718,12 +791,18 @@ for sen_index in range(len(sentence_group)):
         pos_tag, dep_parse, tokens = get_pos_dep_token(sen_token[i])
         change = 0
         for dep in dep_parse:
-            if dep[0] == 'dep' and lemmatizer.lemmatize(tokens[dep[2]], pos="v").lower() in output_relateword_sets:
+            if dep[0] == 'dep' and (lemmatizer.lemmatize(tokens[dep[2]], pos="v").lower() in output_relateword_sets):
                 #print("hello")
                 tokens[dep[2]] = 'return'
                 change = 1
+            elif dep[0] == 'dep' and (lemmatizer.lemmatize(tokens[dep[1]], pos="v").lower() in output_relateword_sets):
+                #print("hello")
+                tokens[dep[1]] = 'return'
+                change = 1
         if change:
             new_sen = recover_sentence(tokens)
+            print("Sentence changed" + "\n ------------------------------------ \n")
+            print(new_sen + "\n ------------------------------------ \n")
             pos_tag, dep_parse, tokens = get_pos_dep_token(new_sen)
             change = 0
         
@@ -793,7 +872,7 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
-    #break
+    break
     #if sen_index == 30:
     #    break
     I = []
