@@ -63,4 +63,4 @@ Given the start and destination addresses, findDirection returns a detailed step
  Now given the next click position ( row and column indices ) among all the unrevealed squares (' M' or' E' ) , return the board after revealing this position according to the following rules :
  Given an expression representing a set of words under the given grammar , return the sorted list of words that the expression represents .
  Return an edge that can be removed so that the resulting graph is a tree of N nodes . If there are multiple answers , return the answer that occurs last in the given 2D-array . The answer edge [ u , v ] should be in the same format , with u &lt; v .
- Write a function strongPasswordChecker ( s ) , that takes a string s as input , and return the MINIMUM change required to make s a strong password . If s is already strong , return 0 .
+ Write a function strongPasswordChecker ( s ) , that takes a string s as input , and return the MINIMUM change required to makes a strong password . If s is already strong , return 0 .
