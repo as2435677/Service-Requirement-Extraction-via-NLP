@@ -41,7 +41,7 @@ node
 list of daily temperatures T
 root node of a binary search tree, value
 expression, evaluation map
-[]
+highest score
 string s
 all the cities, flights with starting city src and the destination dst
 string arrays queries, words
