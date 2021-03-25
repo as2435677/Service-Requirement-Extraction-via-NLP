@@ -56,11 +56,11 @@ sum as a linked list
 complement of it's binary representation as a base-10 integer
 order of the plus sign, 0(if)
 smallest good base of n in string format
-maximum average value
+contiguous subarray of given length k that has the maximum average value, maximum average value
 index of a given target number
 integer, series
 true(if)
 board after revealing this position according to the following rules
 sorted list of words that the expression represents
-answer that occurs last in the given 2D-array
+edge, answer that occurs last in the given 2D-array
 MINIMUM change required to make s a strong password, 0(if)

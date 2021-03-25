@@ -728,7 +728,10 @@ def find_noun_components(relate_dep, dep_parse, tokens, pos_tag):
             del flag
         elif target[0] == 'amod':
             target_noun_index = target[1]
-            temp = recover_compound(target[2], dep_parse, tokens, pos_tag)
+            if target[1] > target[2]:
+                temp = recover_compound(target[1], dep_parse, tokens, pos_tag)
+            else:
+                temp = recover_compound(target[2], dep_parse, tokens, pos_tag)
             if tokens[target_noun_index + 1] == 'in':
                 for dep2 in dep_parse:
                     if dep2[0] == 'case' and tokens[dep2[2]] == 'in' and dep2[2] == target_noun_index + 1:
