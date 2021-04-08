@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 29 10:12:11 2021
+
+@author: ken
+"""
+
+target_file = "./random_sentences"
+f_target = open(target_file, "r")
+target_sentences = f_target.readlines()
+f_target.close()
+del target_file
+
+
+target_file = "./extra_leetcode_data/sentences"
+f_target = open(target_file, "r")
+original_sentences = f_target.readlines()
+f_target.close()
+del target_file
+
+
+fo = open("sentences2", "w")
+
+
+for sen in target_sentences:
+    if sen in original_sentences:
+        continue
+    fo.writelines("%s" % sen)
+fo.close()

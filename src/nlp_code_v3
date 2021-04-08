@@ -37,7 +37,7 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        "The total price of the composite service execution should be at most $500."
        ]
 '''
-dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
+dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/extra_leetcode_data/"
 fo = open(dir_path + "sentences", "r+")
 sentence_group = []
 x = fo.readline()
@@ -596,6 +596,7 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
             
             #keywords.remove(extend_word)
             previous_words = keywords.pop()
+            #print(previous_words)
             if tokens[dep[2]] == 'for':
                 extend_word = previous_words + '_for_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
             elif tokens[dep[2]] == 'from':
@@ -880,7 +881,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[sen_index]
+    sen = sentence_group[81]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
@@ -983,8 +984,8 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
-    #break
-    #if sen_index == 30:
+    break
+    #if sen_index == 80:
     #    break
     I = []
     O = []

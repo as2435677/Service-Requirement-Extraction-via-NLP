@@ -1,0 +1,121 @@
+ Return the result as a list of indices representing the starting position of each interval ( 0-indexed ) . If there are multiple answers , return the lexicographically smallest one .
+ Both input arrays are non-empty and have the same length .
+ Given two non-negative integers num1 and num2 represented as string , return the sum of num1 and num2 .
+ Find the maximum width of a ramp in A . If one doesn't exist , return 0 .
+ Return True if the array is good otherwise return False .
+ Given an integer array nums , find three numbers whose product is maximum and return the maximum product .
+ Given an N x N grid containing only values 0 and 1 , where 0 represents water and 1 represents land , find a water cell such that its distance to the nearest land cell is maximized and return the distance .
+ For number 4 in the first array , you can not find the next greater number for it in the second array , so output -1 .
+ Input points have NO order . No order required for output .
+ Given an integer number n , return the difference between the product of its digits and the sum of its digits .
+ Given a m * n matrix mat and an integer K , return a matrix answer where each answer [ i ] [ j ] is the sum of all elements mat [ r ] [ c ] for i-K &lt; = r &lt; = i + K , j-K &lt; = c &lt; = j + K , and ( r , c ) is a valid position in the matrix .
+ Here is a diagram of the given tree :
+ The length sum of elements in the given array will not exceed 600,000 .
+ Given a list of three points in the plane , return whether these points are a boomerang .
+ The function twoSum should return indices of the two numbers such that they add up to the target , where index1 must be less than index2 .
+ If there are multiple solutions , return the subsequence with minimum size and if there still exist multiple solutions , return the subsequence with the maximum total sum of all its elements . A subsequence of an array can be obtained by erasing some ( possibly zero ) elements from the array .
+ This demonstrated that taking the first 5 was a winning move for Alex , so we return true .
+ Given the integer array cardPoints and the integer k , return the maximum score you can obtain .
+ Each philosopher must alternately think and eat . However , a philosopher can only eat spaghetti when they have both left and right forks . Each fork can be held by only one philosopher and so a philosopher can use the fork only if it is not being used by another philosopher . After an individual philosopher finishes eating , they need to put down both forks so that the forks become available to others . A philosopher can take the fork on their right or the one on their left as they become available , but can not start eating before getting both forks .
+ Stores the key and value , along with the given timestamp .
+ Given the integer n representing the number of courses at some university labeled from 1 to n , and the array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship , that is , the course x i must be taken before the course y i . Also , you are given the integer k .
+ The given num does not contain any leading zero .
+ Note again that at each step of the above process , the order of the books we place is the same order as the given sequence of books . For example , if we have an ordered list of 5 books , we might place the first and second book onto the first shelf , the third book on the second shelf , and the fourth and fifth book on the last shelf .
+ Given a list of queries , and a pattern , return an answer list of booleans , where answer [ i ] is true if and only if queries [ i ] matches the pattern .
+ The given binary tree will have between 1 and 3000 nodes .
+ The length of the given string will in the range [ 1 , 10,000 ] .
+ Given an initial computer network connections . You can extract certain cables between two directly connected computers , and place them between any pair of disconnected computers to make them directly connected . Return the minimum number of times you need to do this in order to make all the computers connected . If it's not possible , return -1 .
+ Given two arrays of integers nums1 and nums2 , return the number of triplets formed ( type 1 and type 2 ) under the following rules :
+ The size of the input 2D-array will be between 3 and 1000 .
+ We are also given the list G , a subset of the values in the linked list .
+ Given an array of integers A sorted in non-decreasing order , return an array of the squares of each number , also in sorted non-decreasing order .
+ The number of nodes in the given tree is less than 4096 .
+ Formally , return the largest V for which V = ( A [ i ] + A [ i +1 ] + ... + A [ i + L-1 ] ) + ( A [ j ] + A [ j +1 ] + ... + A [ j + M-1 ] ) and either :
+ If there is no common prefix , return an empty string " " .
+ Given an integer array nums , return the sum of divisors of the integers in that array that have exactly four divisors .
+ For the sample input , the output is :
+ Write a SQL solution to output big countries' name , population and area .
+ Given an input string ( s ) and a pattern ( p ) , implement regular expression matching with support for' .' and' *' where :
+ You are given an array of variable pairs equations and an array of real numbers values , where equations [ i ] = [ A i , B i ] and values [ i ] represent the equation A i / B i = values [ i ] . Each A i or B i is a string that represents a single variable .
+ Now , given a list of words , each word can be written as a concatenation of the Morse code of each letter . For example , " cab " can be written as "-.-. . -- ... " , ( which is the concatenation "-.-. " + " .-" + "-... " ) . We'll call such a concatenation , the transformation of a word .
+ Return the length of the shortest such clear path from top-left to bottom-right . If such a path does not exist , return -1 .
+ Given a positive integer num , output its complement number . The complement strategy is to flip the bits of its binary representation .
+ Note that the input array is passed in by reference , which means a modification to the input array will be known to the caller as well .
+ It is guaranteed that answer is unique under the given rules .
+ Given a non-negative integer n which represents the number of LEDs that are currently on , return all possible times the watch could represent .
+ For the example above , the output should be :
+ Given a matrix of M x N elements ( M rows , N columns ) , return all elements of the matrix in diagonal order as shown in the below image .
+ Given the integer n and the array roads , return the maximal network rank of the entire infrastructure .
+ Given a set of pairs , find the length longest chain which can be formed . You needn't use up all the given pairs . You can select pairs in any order .
+ Given an integer N as input , return the number of' 1's in the first N number in the magical string S .
+ We return 32 since it is the longest absolute path to a file .
+ The Graph is connected and all nodes can be visited starting from the given node .
+ Since the return type is an integer , the decimal digits are truncated and only the integer part of the result is returned .
+ return : 1
+ Given a binary tree , return the level order traversal of its nodes' values . ( ie , from left to right , level by level ) .
+ GetMaxKey ( )-Returns one of the keys with maximal value . If no element exists , return an empty string " " .
+ int ping ( int t ) Adds a new request at time t , where t represents some time in milliseconds , and returns the number of requests that has happened in the past 3000 milliseconds ( including the new request ) . Specifically , return the number of requests that have happened in the inclusive range [ t-3000 , t ] .
+ Given two anagrams A and B , return the smallest K for which A and B are K-similar .
+ Given a lower and upper number bound , output a list of every possible self dividing number , including the bounds if possible .
+ Return the minimum integer you can obtain also as a string .
+ Given a square at location ( r0 , c0 ) in the grid and a color , color the border of the connected component of that square with the given color , and return the final grid .
+ Any given bucket can be sampled an infinite number of times ( by an unlimited number of pigs ) .
+ A string S of lowercase English letters is given . We want to partition this string into as many parts as possible so that each letter appears in at most one part , and return a list of integers representing the size of these parts .
+ We made 2 refueling stops along the way , so we return 2 .
+ You are given a 2D char matrix representing the game board .' M' represents an unrevealed mine ,' E' represents an unrevealed empty square ,' B' represents a revealed blank square that has no adjacent ( above , below , left , right , and all 4 diagonals ) mines , digit (' 1' to' 8' ) represents how many mines are adjacent to this revealed square , and finally' X' represents a revealed mine .
+ We are to write the letters of a given string S , from left to right into lines . Each line has maximum width 100 units , and if writing a letter would cause the width of the line to exceed 100 units , it is written on the next line . We are given an array widths , an array where widths [ 0 ] is the width of' a' , widths [ 1 ] is the width of' b' , ... , and widths [ 25 ] is the width of' z' .
+ Given the head of a linked list , remove the n th node from the end of the list and return its head .
+ Given a VPS represented as string s , return the nesting depth of s .
+ Given an integer array A , and an integer target , return the number of tuples i , j , k such that i &lt; j &lt; k and A [ i ] + A [ j ] + A [ k ] == target .
+ The same instance of FooBar will be passed to two different threads . Thread A will call foo ( ) while thread B will call bar ( ) . Modify the given program to output " foobar " n times .
+ Note that we were not given A directly , only a root node root = Construct ( A ) .
+ You may assume k is always valid , ie : k is always smaller than input array's size for non-empty array .
+ You are given an array of distinct positive integers locations where locations [ i ] represents the position of city i . You are also given integers start , finish and fuel representing the starting city , ending city , and the initial amount of fuel you have , respectively .
+ You are a hiker preparing for an upcoming hike . You are given heights , a 2D array of size rows x columns , where heights [ row ] [ col ] represents the height of cell ( row , col ) . You are situated in the top-left cell , ( 0 , 0 ) , and you hope to travel to the bottom-right cell , ( rows-1 , columns-1 ) ( i.e. , 0-indexed ) . You can move up , down , left , or right , and you wish to find a route that requires the minimum effort .
+ Return the kth string of this list or return an empty string if there are less than k happy strings of length n .
+ For example , given the following tree :
+ You are given K eggs , and you have access to a building with N floors from 1 to N .
+ Imagine you are given a real file system , how will you search files ? DFS or BFS ?
+ The input board won't be a stage when game is over ( some mines have been revealed ) .
+ As the answer can be very large , return the answer modulo 10 ^ 9 + 7 .
+ Given a range [ m , n ] where 0 &lt; = m &lt; = n &lt; = 2147483647 , return the bitwise AND of all numbers in this range , inclusive .
+ Return the answers to all queries . If a single answer can not be determined , return-1.0 .
+ Return True if its possible otherwise return False .
+ Return the minimum number of moves to transform the given array nums into a zigzag array .
+ For example , given 13 , return : [ 1,10,11,12,13,2,3,4,5,6,7,8,9 ] .
+ It is not necessary to use all characters in letters and each letter can only be used once . Score of letters' a' ,' b' ,' c' , ... ,' z' is given by score [ 0 ] , score [ 1 ] , ... , score [ 25 ] respectively .
+ Some people will make friend requests . The list of their ages is given and ages [ i ] is the age of the ith person .
+ If the number is divisible by 5 , output " buzz " .
+ The value in the given matrix is in the range of [ 0 , 255 ] .
+ Return true if and only if you can provide every customer with correct change .
+ Note that the cargo must be shipped in the order given , so using a ship of capacity 14 and splitting the packages into parts like ( 2 , 3 , 4 , 5 ) , ( 1 , 6 , 7 ) , ( 8 ) , ( 9 ) , ( 10 ) is not allowed .
+ We write the integers of A and B ( in the order they are given ) on two separate horizontal lines .
+ You are given an array of distinct integers arr and an array of integer arrays pieces , where the integers in pieces are distinct . Your goal is to form arr by concatenating the arrays in pieces in any order . However , you are not allowed to reorder the integers in each array pieces [ i ] .
+ Given the array nums , obtain a subsequence of the array whose sum of elements is strictly greater than the sum of the non included elements in such subsequence .
+ Then , we go back to the start of the row , giving n + 1 candies to the first person , n + 2 candies to the second person , and so on until we give 2 * n candies to the last person .
+ If the query has no matches in the wordlist , you should return the empty string .
+ When the query matches a word up to capitlization , you should return the first such match in the wordlist .
+ Given a tree ( i.e. a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges . The root of the tree is the node 0 , and each node of the tree has a label which is a lower-case character given in the string labels ( i.e . The node with the number i has the label labels [ i ] ) .
+ Given two arrays of integers with equal lengths , return the maximum value of :
+ Given a N * N matrix M representing the friend relationship between students in the class . If M [ i ] [ j ] = 1 , then the i th and j th students are direct friends with each other , otherwise not . And you have to output the total number of friend circles among all the students .
+ Given an integer n , add a dot ( " . " ) as the thousands separator and return it in string format .
+ You are given a target value to search . If found in the array return true , otherwise return false .
+ You may return any answer array that satisfies this condition .
+ You are given a rows x cols matrix grid . Initially , you are located at the top-left corner ( 0 , 0 ) , and in each step , you can only move right or down in the matrix .
+ Given an input string s , reverse the order of the words .
+ Given an m x n 2d grid map of' 1' s ( land ) and' 0' s ( water ) , return the number of islands .
+ You can return the answer in any order .
+ Therefore , return 3 as the starting index .
+ In a string composed of 'L' ,' R' , and' X' characters , like " RXXLRXRXL " , a move consists of either replacing one occurrence of " XL " with " LX " , or replacing one occurrence of " RX " with " XR " . Given the starting string start and the ending string end , return True if and only if there exists a sequence of moves to transform one string to the other .
+ Given a root node reference of a BST and a key , delete the node with the given key in the BST . Return the root node reference ( possibly updated ) of the BST .
+ A mapping of digit to letters ( just like on the telephone buttons ) is given below . Note that 1 does not map to any letters .
+ Return the minimum number of semesters to take all courses . It is guaranteed that you can take all courses in some way .
+ You are given an array of network towers towers and an integer radius , where towers [ i ] = [ x i , y i , q i ] denotes the i th network tower with location ( x i , y i ) and quality factor q i . All the coordinates are integral coordinates on the X-Y plane , and the distance between two coordinates is the Euclidean distance .
+ You are given a string s of even length consisting of digits from 0 to 9 , and two integers a and b .
+ How many valid permutations are there ? Since the answer may be large , return your answer modulo 10 ^ 9 + 7 .
+ Given a non-empty binary tree , return the average value of the nodes on each level in the form of an array .
+ Output : Return 4 , and the first 4 characters of the input array should be : [ " a " , " b " , " 1 " , " 2 " ] .
+ What if the given array is already sorted ? How would you optimize your algorithm ?
+ Given n , return the value of T n .
+ return its zigzag level order traversal as :
+ If no such index exists , we should return -1 . If there are multiple pivot indexes , you should return the left-most pivot index .

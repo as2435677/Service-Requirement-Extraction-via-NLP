@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 29 09:40:27 2021
+
+@author: ken
+"""
+import numpy
+import random
+
+
+
+target_file = "/home/ken/leetcode_web_crawler/sentences.txt"
+f_target = open(target_file, "r")
+target_sentences = f_target.readlines()
+f_target.close()
+fo = open("random_sentences", "w")
+
+def shuffle_sentences(sentences):
+    index = random.sample(range(len(target_sentences)), 100)
+    #shuffle_index = random.shuffle(index)
+    return sentences[index]
+    
+shuffle_sentences = random.sample(target_sentences, 300)
+for sen in shuffle_sentences:
+    fo.writelines("%s" % sen)
+fo.close()

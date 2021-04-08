@@ -1,0 +1,108 @@
+/
+arrays
+two non-negative integers num1 and num2 represented as string
+/
+/
+integer array nums
+N x N grid containing only values 0 and 1
+/
+integer number n
+m * n matrix mat, integer K
+tree
+array
+a list of three points in the plane
+/
+/
+/
+integer array cardPoints, integer k
+the fork on their right or the one on their left as they become available
+timestamp
+integer n representing the number of courses at some university labeled from 1 to n, array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship, integer k
+num
+sequence of books
+list of queries, pattern
+binary tree
+string
+initial computer network connections
+two arrays of integers nums1 and nums2
+2D-array
+list G 
+array of integers A sorted in non-decreasing order
+tree
+/
+/
+integer array nums
+/
+input string, pattern
+array of variable pairs equations, array of real numbers values
+list of words
+/
+positive integer num
+array
+rules
+non-negative integer n which represents the number of LEDs that are currently on
+matrix of M x N elements
+integer n, the array roads
+set of pairs
+/
+node
+/
+binary tree
+/
+/
+two anagrams A and B
+lower number bound, upper number bound
+/
+bucket
+/
+2D char matrix representing the game board
+string S, array widths
+head of a linked list
+VPS represented as string s
+integer array A, integer target
+A 
+array
+array of distinct positive integers locations, integers start
+heights
+/
+following tree
+K eggs
+real file system
+board
+/
+range
+/
+/
+array nums
+list of their ages
+/
+matrix
+every customer with correct change
+order
+array of distinct integers arr, an array of integer arrays pieces
+array nums
+/
+/
+tree consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges, string labels
+two arrays of integers with equal lengths
+N * N matrix M representing the friend relationship between students in the class
+integer n
+target value to search
+/
+rows x cols matrix grid
+input string s
+m x n 2d grid map of' 1' s ( land ) and' 0' s ( water )
+/
+/
+starting string start, the ending string end
+root node reference of a BST and a key
+A mapping of digit to letters
+all courses in some way
+array of network towers towers, an integer radius
+string s of even length consisting of digits from 0 to 9, two integers a and b
+/
+non-empty binary tree
+array
+n
+/
+/

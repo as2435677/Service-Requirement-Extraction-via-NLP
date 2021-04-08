@@ -1,0 +1,288 @@
+ Given the root of a binary tree , return the sum of every tree node's tilt .
+ Return the root of the trimmed binary search tree . Note that the root may change depending on the given bounds .
+ Explanation : 3 does not exist in the array , so we return -1 .
+ Given a directed acyclic graph ( DAG ) of n nodes labeled from 0 to n-1 , find all possible paths from node 0 to node n-1 , and return them in any order .
+ Given a collection of integers that might contain duplicates , nums , return all possible subsets ( the power set ) .
+ Alice and Bob take turns playing a game , with Alice starting first .
+ The above output corresponds to the 5 unique BST's shown below :
+ Explanation : The array contains less than 2 elements , therefore return 0 .
+ Given a binary tree , return the sum of values of nodes with even-valued grandparent . ( A grandparent of a node is the parent of its parent , if it exists . )
+ Explanation : 4 isn't at least as big as twice the value of 3 , so we return -1 .
+ The input string only contains' 0' to' 9' ,' /' ,' +' and'-' . So does the output .
+ Reverse bits of a given 32 bits unsigned integer .
+ Return the latest 24-hour time in " HH : MM " format . If no valid time can be made , return an empty string .
+ If the' reshape' operation with given parameters is possible and legal , output the new reshaped matrix ; Otherwise , output the original matrix .
+ Given the roots of two binary trees root1 and root2 , return true if the two trees are flip equivelent or false otherwise .
+ Given two strings a and b , return the minimum number of times you should repeat string a so that string b is a substring of it . If it is impossible for b to be a substring of a after repeating it , return-1 .
+ Given a non-empty array of integers , return the k most frequent elements .
+ The input is two lists : the subroutines called and their arguments . Solution's constructor has two arguments , N and the blacklist B . pick has no arguments . Arguments are always wrapped with a list , even if there aren't any .
+ The two dates are given as strings , their format is YYYY-MM-DD as shown in the examples .
+ Suppose n lights are labeled as number [ 1 , 2 , 3 ... , n ] , function of these 4 buttons are given below :
+ You are given an array points , an integer angle , and your location , where location = [ pos x , pos y ] and points [ i ] = [ x i , y i ] both denote integral coordinates on the X-Y plane .
+ You need to help them find out their common interest with the least list index sum . If there is a choice tie between answers , output all of them with no order requirement . You could assume there always exists an answer .
+ Explanation : You will be initially given box 0 . You will find 7 candies in it and boxes 1 and 2 . Box 1 is closed and you don't have a key for it so you will open box 2 . You will find 4 candies and a key to box 1 in box 2 .
+ It's guaranteed that for the given test cases there is always possible to find a binary search tree with the given requirements .
+ Now given all the cities and flights , together with starting city src and the destination dst , your task is to find the cheapest price from src to dst with up to k stops . If there is no such route , output-1 .
+ Given a puzzle board , return the least number of moves required so that the state of the board is solved . If it is impossible for the state of the board to be solved , return -1 .
+ Alice and Bob continue their games with piles of stones . There are several stones arranged in a row , and each stone has an associated value which is an integer given in the array stoneValue .
+ Since the answer may be too large , return it modulo 10 ^ 9 + 7 .
+ lFUCache.get ( 3 ) ; / / return 3
+ You are given coins of different denominations and a total amount of money . Write a function to compute the number of combinations that make up that amount . You may assume that you have infinite number of each kind of coin .
+ / / User 1's news feed should return a list with 2 tweet ids-&gt; [ 6 , 5 ] .
+ Given an integer array destination and an integer k , return the k th lexicographically smallest instructions that will take Bob to destination .
+ productOfNumbers.getProduct ( 4 ) ; / / return 0 . The product of the last 4 numbers is 0 * 2 * 5 * 4 = 0
+ lRUCache.get ( 4 ) ; / / return 4
+ Given two integers n and k , return all possible combinations of k numbers out of 1 ... n .
+ StreamChecker ( words ) : Constructor , init the data structure with the given words .
+ Length of the given string and k will in the range [ 1 , 10000 ]
+ cashier.getBill ( [ 2,3,5 ] , [ 5,3,2 ] ) ; / / return 2500.0
+ fancy.getIndex ( 0 ) ; / / return 10
+ streamChecker.query (' a' ) ; / / return false
+ Words in the list of banned words are given in lowercase , and free of punctuation . Words in the paragraph are not case sensitive . The answer is in lowercase .
+ Given an array nums of integers , return how many of them contain an even number of digits .
+ myQueue.empty ( ) ; / / return false
+ Explanation : " testemail@leetcode.com " and "testemail@lee.tcode.com " actually receive mails
+ You need to output 1 .
+ Explanation : We return 3 because by repeating a three times " ab cdabcdab cd " , b is a substring of it .
+ What if negative numbers are allowed in the given array ?
+ So you finally need to output 3 .
+ Therefore , return the median sliding window as [ 1,-1,-1,3,5,6 ] .
+ You are also given an integer maxCost .
+ The given r and c are all positive .
+ NOTE : input types have been changed on April 15 , 2019 . Please reset to default code definition to get new method signature .
+ n is a non-negative integer which won't exceed the input array size .
+ ParkingSystem ( int big , int medium , int small ) Initializes object of the ParkingSystem class . The number of slots for each parking space are given as part of the constructor .
+ Note : The input is always valid . You may assume that evaluating the queries will not result in division by zero and that there is no contradiction .
+ You are given coins of different denominations and a total amount of money amount . Write a function to compute the fewest number of coins that you need to make up that amount . If that amount of money can not be made up by any combination of the coins , return-1 .
+ Given a string s , return the maximum number of ocurrences of any substring under the following rules :
+ You can swap the characters at any pair of indices in the given pairs any number of times .
+ Return True if the equation is solvable otherwise return False .
+ You may assume that there are no duplicate edges in the input prerequisites .
+ Given an integer n , return any array containing n unique integers such that they add up to 0 .
+ Explanation : The input binary string 11111111111111111111111111111101 represents the unsigned integer 4294967293 , so return 3221225471 which its binary representation is 10111111111111111111111111111111 .
+ skiplist.erase ( 0 ) ; / / return false , 0 is not in skiplist .
+ Given an n-ary tree , return the postorder traversal of its nodes' values .
+ lFUCache.get ( 3 ) ; / / return 3
+ A web developer needs to know how to design a web page's size . So , given a specific rectangular web page ’s area , your job by now is to design a rectangular web page , whose length L and width W satisfy the following requirements :
+ Since the answer may be large , return the answer modulo 10 ^ 9 + 7 .
+ kthLargest.add ( 3 ) ; / / return 4
+ Therefore the output is 7 .
+ The couples' initial seating is given by row [ i ] being the value of the person who is initially sitting in the i-th seat .
+ Given an integer array of digits , return the largest multiple of three that can be formed by concatenating some of the given digits in any order .
+ For item 2 with price [ 2 ] = 6 you will receive a discount equivalent to prices [ 3 ] = 2 , therefore , the final price you will pay is 6-2 = 4 .
+ Step 3 ) 2 is even ; divide by 2 and obtain 1 .
+ The size of the given array will be in the range [ 1,1000 ] .
+ You are given a string s , a split is called good if you can split s into 2 non-empty strings p and q where its concatenation is equal to s and the number of distinct letters in p and q are the same .
+ Explanation : There are three threads being fired asynchronously . The input [ 1,2,3 ] means thread A calls first ( ) , thread B calls second ( ) , and thread C calls third ( ) . " firstsecondthird " is the correct output .
+ Explanation : It's ok for the output to have leading zeros , but the input is guaranteed not to have any leading zeros .
+ Each person should appear in exactly one group , and every person must be in a group . If there are multiple answers , return any of them . It is guaranteed that there will be at least one valid solution for the given input .
+ You are given an integer array prices where prices [ i ] is the price of a given stock on the i th day .
+ subrectangleQueries.getValue ( 0 , 2 ) ; / / return 5
+ Return a list containing the IDs ( 0-indexed ) of the busiest server ( s ) . You may return the IDs in any order .
+ Explanation : We return the node with value 2 , colored in yellow in the diagram .
+ Explanation : The given undirected graph will be like this :
+ For example , given the above Logs table , 1 is the only number that appears consecutively for at least three times .
+ You may assume all numbers in the input are non-negative integers .
+ Now your job is to find the total Hamming distance between all pairs of the given numbers .
+ Return the minimum number of boats to carry every given person . ( It is guaranteed each person can be carried by a boat . )
+ We are given a string S of' 0' s and' 1' s , and we may flip any' 0' to a' 1' or a' 1' to a' 0' .
+ Calling Successor ( king , curOrder ) will return Alice , so we append to curOrder to get [ " king " , " Alice " ] .
+ The length of the given list will be in the range of [ 2 , 50 ] .
+ At the end , return the modified image .
+ Explanation : The given directed graph will be like this :
+ For item 1 with price [ 1 ] = 4 you will receive a discount equivalent to prices [ 3 ] = 2 , therefore , the final price you will pay is 4-2 = 2 .
+ Given N , return any beautiful array A . ( It is guaranteed that one exists . )
+ In a given 2D binary array A , there are two islands . ( An island is a 4-directionally connected group of 1 s not connected to any other 1s . )
+ Return True if the circle and rectangle are overlapped otherwise return False .
+ You are given an array of positive integers w where w [ i ] describes the weight of i th index ( 0-indexed ) .
+ For each such occurrence , add " third " to the answer , and return the answer .
+ Given the root node of a binary search tree ( BST ) and a value . You need to find the node in the BST that the node's value equals the given value . Return the subtree rooted with that node . If such node doesn't exist , you should return NULL .
+ Take the top card of the deck , reveal it , and take it out of the deck .
+ We are given a matrix with R rows and C columns has cells with integer coordinates ( r , c ) , where 0 &lt; = r &lt; R and 0 &lt; = c &lt; C .
+ Now given a string represented by several bits . Return whether the last character must be a one-bit character or not . The given string will always end with a zero .
+ Given a rows * columns matrix mat of ones and zeros , return how many submatrices have all ones .
+ circularQueue.enQueue ( 3 ) ; / / return true
+ First , take the 1st course , it costs 100 days so you will finish it on the 100th day , and ready to take the next course on the 101st day .
+ int get ( index , snap_id ) returns the value at the given index , at the time we took the snapshot with the given snap_id
+ Each element in the input arrays is a non-negative integer .
+ The average value of nodes on level 0 is 3 , on level 1 is 14.5 , and on level 2 is 11 . Hence return [ 3 , 14.5 , 11 ] .
+ This is an invalid board that you will not receive-as battleships will always have a cell separating between them .
+ An encoded string S is given . To find and write the decoded string to a tape , the encoded string is read one character at a time and the following steps are taken :
+ fancy.getIndex ( 1 ) ; / / return 34
+ The input strings consist of lowercase English characters only .
+ We would like to write an expression with the least number of operators such that the expression equals the given target . Return the least number of operators used .
+ Explanation : There is no way to reorder the elements to obtain an arithmetic progression .
+ Return the city with the smallest number of cities that are reachable through some path and whose distance is at most distanceThreshold , If there are multiple such cities , return the city with the greatest number .
+ A zero-indexed array A of length N contains all integers from 0 to N-1 . Find and return the longest length of set S , where S [ i ] = { A [ i ] , A [ A [ i ] ] , A [ A [ A [ i ] ] ] , ... } subjected to the rule below .
+ Given two non-negative integers num1 and num2 represented as strings , return the product of num1 and num2 , also represented as a string .
+ wordFilter.f ( " a " , " e " ) ; / / return 0 , because the word at index 0 has prefix = " a " and suffix =' e " .
+ The input strings will be given in the form of a + bi , where the integer a and b will both belong to the range of [-100 , 100 ] . And the output should be also in this form .
+ Return the largest possible height of your billboard installation . If you can not support the billboard , return 0 .
+ Now given the next click position ( row and column indices ) among all the unrevealed squares (' M' or' E' ) , return the board after revealing this position according to the following rules :
+ Return the string after making it good . The answer is guaranteed to be unique under the given constraints .
+ Return the maximum score of any valid set of words formed by using the given letters ( words [ i ] can not be used two or more times ) .
+ What should we return when needle is an empty string ? This is a great question to ask during an interview .
+ Find the minimum cost to merge all piles of stones into one pile . If it is impossible , return-1 .
+ You are given a sorted array consisting of only integers where every element appears exactly twice , except for one element which appears exactly once . Find this single element that appears only once .
+ If the two linked lists have no intersection at all , return null .
+ Players take turns placing characters into empty squares ( " " ) .
+ Return true if it is possible to form a palindrome string , otherwise return false .
+ Explanation : Note that the input contains one empty list . The graph consists of only one node with val = 1 and it does not have any neighbors .
+ Explanation : The input [ 1,3,2 ] means thread A calls first ( ) , thread B calls third ( ) , and thread C calls second ( ) . " firstsecondthird " is the correct output .
+ A string S of lowercase letters is given . Then , we may make any number of moves .
+ Return [ total_jumbo , total_small ] so that the number of remaining tomatoSlices equal to 0 and the number of remaining cheeseSlices equal to 0 . If it is not possible to make the remaining tomatoSlices and cheeseSlices equal to 0 return [ ] .
+ Given such a binary tree , you need to output the second minimum value in the set made of all the nodes' value in the whole tree .
+ What is the minimum number of stickers that you need to spell out the target ? If the task is impossible , return -1 .
+ You are given an integer num . You will apply the following steps exactly two times :
+ If it can not be done , return-1 .
+ We start at the source square and want to reach the target square . Each move , we can walk to a 4-directionally adjacent square in the grid that isn't in the given list of blocked squares .
+ pick return a point as an array of integer coordinates [ p_x , p_y ]
+ You may assume that the input string is always valid ; No extra white spaces , square brackets are well-formed , etc.
+ Note that in some languages such as Java , there is no unsigned integer type . In this case , both input and output will be given as a signed integer type . They should not affect your implementation , as the integer's internal binary representation is the same , whether it is signed or unsigned .
+ Step 2 ) 14 is even , divide by 2 and obtain 7 .
+ Total length of input string will be 3 n , where 1 ≤ n ≤ 20 .
+ Count and return the number of maximum integers in the matrix after performing all the operations .
+ We then go to room 3 . Since we were able to go to every room , we return true .
+ Step 1 ) 8 is even ; divide by 2 and obtain 4 .
+ solution.shuffle ( ) ; / / Shuffle the array [ 1,2,3 ] and return its result . Any permutation of [ 1,2,3 ] must be equally likely to be returned . Example : return [ 3 , 1 , 2 ]
+ Now , given 3 things-start , end , bank , your task is to determine what is the minimum number of mutations needed to mutate from " start " to " end " . If there is no such a mutation , return -1 .
+ kthLargest.add ( 10 ) ; / / return 5
+ You are given an m x n matrix M initialized with all 0's and an array of operations ops , where ops [ i ] = [ a i , b i ] means M [ x ] [ y ] should be incremented by one for all 0 &lt; = x &lt; a i and 0 &lt; = y &lt; b i .
+ Write the code that will take a string and make this conversion given a number of rows :
+ For each call to the method MyCalendar.book , return an integer K representing the largest integer such that there exists a K-booking in the calendar .
+ circularDeque.isFull ( ) ; / / return true
+ A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null .
+ Given an integer n , return a string with n characters such that each character in such string occurs an odd number of times .
+ Given n , the number of stones in the heap , return true if you can win the game assuming both you and your friend play optimally , otherwise return false .
+ Explanation : You have to take all the cards . Your score is the sum of points of all cards .
+ All the given strings' lengths will not exceed 10 .
+ The given d is in range [ 1 , maximum depth of the given tree + 1 ] .
+ For example , according to the above table , we should output :
+ Given a positive 32-bit integer n , you need to find the smallest 32-bit integer which has exactly the same digits existing in the integer n and is greater in value than n . If no such positive 32-bit integer exists , you need to return -1 .
+ There're totally 4 courses , but you can take 3 courses at most :
+ You can not concatenate numbers together . For example , if the input is [ 1 , 2 , 1 , 2 ] , we can not write this as 12 + 12 .
+ Calling hasNext ( ) after that should return false .
+ The input contains N integers . Every integer is in the range of -2 31 and 2 31-1 and 0 ≤ N ≤ 1000 . The output is guaranteed to be less than 2 31-1 .
+ iterator.next ( ) ; / / return 9
+ Step 6 ) 2 is even , divide by 2 and obtain 1 .
+ input may contain lowercase or uppercase English letters , a new line character' \ n' , a tab character' \ t' , a dot' .' , a space '' , and digits .
+ You are given an m * n matrix , mat , and an integer k , which has its rows sorted in non-decreasing order .
+ For a given number N in base-10 , return the complement of it's binary representation as a base-10 integer .
+ Explanation : Factors list is [ 1 , 2 , 4 ] , there is only 3 factors . We should return -1 .
+ Follow-up : Can you implement the queue such that each operation is amortized O ( 1 ) time complexity ? In other words , performing n operations will take overall O ( n ) time even if one of those operations may take longer .
+ There is no way to obtain a string that is lexicographically smaller then " 24 " .
+ You are given a doubly linked list which in addition to the next and previous pointers , it could have a child pointer , which may or may not point to a separate doubly linked list . These child lists may have one or more children of their own , and so on , to produce a multilevel data structure , as shown in the example below .
+ If we can not do so , then return the list [-1 ] .
+ The given input is a directed graph that started as a rooted tree with N nodes ( with distinct values 1 , 2 , ... , N ) , with one additional directed edge added . The added edge has two different vertices chosen from 1 to N , and was not an edge that already existed .
+ Return the shortest such subarray and output its length .
+ The output order does not matter , returning [ 9,0 ] is fine too .
+ getFront ( ) : Gets the front item from the Deque . If the deque is empty , return -1 .
+ Given a graph , and assuming both players play optimally , return 1 if the game is won by Mouse , 2 if the game is won by Cat , and 0 if the game is a draw .
+ Given a square matrix mat , return the sum of the matrix diagonals .
+ Given an array A of positive integers ( not necessarily distinct ) , return the lexicographically largest permutation that is smaller than A , that can be made with one swap ( A swap exchanges the positions of two numbers A [ i ] and A [ j ] ) . If it can not be done , then return the same array .
+ Given the root of a binary tree , return an array of the largest value in each row of the tree ( 0-indexed ) .
+ Return the maximum number of different types of candies you can give to the sister .
+ The relative order inside both the even and odd groups should remain as it was in the input .
+ Given a singly linked list , return a random node's value from the linked list . Each node must have the same probability of being chosen .
+ Given a binary string S ( a string consisting only of' 0' and' 1's ) and a positive integer N , return true if and only if for every integer X from 1 to N , the binary representation of X is a substring of S.
+ For example , if the sequence is " ababc " , and the stamp is " abc " , then we could return the answer [ 0 , 2 ] , corresponding to the moves " ????? "-&gt; " abc ?? "-&gt; " ababc " .
+ circularDeque.insertLast ( 1 ) ; / / return true
+ If there is no solution for the equation , return " No solution " .
+ Return the same tree where every subtree ( of the given tree ) not containing a 1 has been removed .
+ Explanation : The figure above represents the given rectangular cake . Red lines are the horizontal and vertical cuts . After you cut the cake , the green and yellow pieces of cake have the maximum area .
+ Return true if and only if it is possible to pick up and drop off all passengers for all the given trips .
+ CBTInserter ( TreeNode root ) initializes the data structure on a given tree with head node root ;
+ For each call to the method MyCalendar.book , return true if the event can be added to the calendar successfully without causing a double booking . Otherwise , return false and do not add the event to the calendar .
+ The input list is already sorted in ascending order by the left x position Li .
+ parkingSystem.addCar ( 2 ) ; / / return true because there is 1 available slot for a medium car
+ Now , we would like to implement the following query function : TopVotedCandidate.q ( int t ) will return the number of the person that was leading the election at time t .
+ Given a binary tree , find the lowest common ancestor ( LCA ) of two given nodes in the tree .
+ magicDictionary.search ( " hell " ) ; / / return False
+ The resulting graph is given as a 2D-array of edges . Each element of edges is a pair [ u , v ] with u &lt; v , that represents an undirected edge connecting nodes u and v .
+ You are given a tree with n nodes numbered from 0 to n-1 in the form of a parent array where parent [ i ] is the parent of node i . The root of the tree is node 0 .
+ For example , given
+ The input is two lists : the subroutines called and their arguments . Solution's constructor has two arguments , n_rows and n_cols . flip and reset have no arguments . Arguments are always wrapped with a list , even if there aren't any .
+ Given an array of integers rollMax and an integer n , return the number of distinct sequences that can be obtained with exact n rolls .
+ You may assume the input string will only contain letters of alphabet .
+ skiplist.search ( 0 ) ; / / return false .
+ We are given a personal information string S , which may represent either an email address or a phone number .
+ lRUCache.get ( 1 ) ; / / return -1 ( not found )
+ The Linked List is represented in the input / output as a list of n nodes . Each node is represented as a pair of [ val , random_index ] where :
+ The node with value 5 and the node with value 6 have the same position according to the given scheme .
+ Finally , player 1 has more score ( 234 ) than player 2 ( 12 ) , so you need to return True representing player1 can win .
+ You are given a list of preferences for n friends , where n is always even .
+ For each cut you choose the direction : vertical or horizontal , then you choose a cut position at the cell boundary and cut the pizza into two pieces . If you cut the pizza vertically , give the left part of the pizza to a person . If you cut the pizza horizontally , give the upper part of the pizza to a person . Give the last piece of pizza to the last person .
+ You have n binary tree nodes numbered from 0 to n-1 where node i has two children leftChild [ i ] and rightChild [ i ] , return true if and only if all the given nodes form exactly one valid binary tree .
+ We are given hours , a list of the number of hours worked per day for a given employee .
+ cashier.getBill ( [ 7,3 ] , [ 10,10 ] ) ; / / return 4000.0
+ Explanation :' e' must have been pressed twice , but it wasn't in the typed output .
+ You are given an integer array groupSizes , where groupSizes [ i ] is the size of the group that person i is in . For example , if groupSizes [ 1 ] = 3 , then person 1 must be in a group of size 3 .
+ magicDictionary.search ( " hello " ) ; / / return False
+ Return the latest step at which there exists a group of ones of length exactly m . If no such group exists , return-1 .
+ kv.get ( " foo " , 4 ) ; / / output " bar2 "
+ streamChecker.query (' k' ) ; / / return false
+ Given a positive integer n . Return True if and only if Alice wins the game otherwise return False , assuming both players play optimally .
+ You're given the startTime , endTime and profit arrays , you need to output the maximum profit you can take such that there are no 2 jobs in the subset with overlapping time range .
+ Given a set of distinct integers , nums , return all possible subsets ( the power set ) .
+ Can you save the day ? If so , what is the number of walls required ? If not , and the world becomes fully infected , return the number of walls used .
+ The parts should be in order of occurrence in the input list , and parts occurring earlier should always have a size greater than or equal parts occurring later .
+ Since the answer may be too large , return it modulo 10 ^ 9 + 7 .
+ We are given an array asteroids of integers representing asteroids in a row .
+ Given a list of emails , we send one email to each address in the list . How many different addresses actually receive mails ?
+ streamChecker.query (' h' ) ; / / return false
+ Given a number N , return a string consisting of " 0 " s and " 1 " s that represents its value in base-2 ( negative two ) .
+ For example , given
+ You are given an array requests where requests [ i ] = [ from i , to i ] represents an employee's request to transfer from building from i to building to i .
+ Given an array consists of non-negative integers , your task is to count the number of triplets chosen from the array that can make triangles if we take them as side lengths of a triangle .
+ Explanation : arr1 represents 11 , arr2 represents 5 , the output represents 16 .
+ streamChecker.query ( 'd' ) ; / / return true , because' cd' is in the wordlist
+ Since the answer may be too large , return it modulo 10 ^ 9 + 7 .
+ Explanation : The robot moves left twice . It ends up two " moves " to the left of the origin . We return false because it is not at the origin at the end of its moves .
+ You are given the number of rows n_rows and number of columns n_cols of a 2D binary matrix where all values are initially 0 . Write a function flip which chooses a 0 value uniformly at random , changes it to 1 , and then returns the position [ row.id , col.id ] of that value . Also , write a function reset which sets all values back to 0 . Try to minimize the number of calls to system's Math.random ( ) and optimize the time and space complexity .
+ Given a paragraph and a list of banned words , return the most frequent word that is not in the list of banned words . It is guaranteed there is at least one word that isn't banned , and that the answer is unique .
+ Explanation : This is a valid IPv4 address , return " IPv4 " .
+ Given the initial state of the prison , return the state of the prison after N days ( and N such changes described above . )
+ The number of given pairs will be in the range [ 1 , 1000 ] .
+ Return True if it is possible to construct the target array from A otherwise return False .
+ iterator.hasNext ( ) ; / / return false
+ If there are multiple answers , you may return any one of them . It is guaranteed an answer exists .
+ The length of given array won't exceed 10000 .
+ Given an array positions where positions [ i ] = [ x i , y i ] is the position of the ith customer on the map , return the minimum sum of the euclidean distances to all customers .
+ kv.get ( " foo " , 1 ) ; / / output " bar "
+ public void fizz ( printFizz ) { ... } / / only output " fizz "
+ customStack.pop ( ) ; / / return 202 -- &gt; Return top of the stack 102 , stack becomes [ 201 ]
+ The profit was never positive , so return -1 .
+ For items 3 and 4 you will not receive any discount at all .
+ Given two integers A and B , return any string S such that :
+ Using the above function , we can always obtain a unique order of inheritance .
+ If the number is divisible by 3 , output " fizz " .
+ It doesn't matter what you leave beyond the returned length . For example if you return 2 with nums = [ 2,2,3,3 ] or nums = [ 2,3,0,0 ] , your answer will be accepted .
+ bool erase ( int num ) : Remove a value in the Skiplist . If num does not exist in the Skiplist , do nothing and return false . If there exists multiple num values , removing any one of them is fine .
+ Return the number of ways of cutting the pizza such that each piece contains at least one apple . Since the answer can be a huge number , return this modulo 10 ^ 9 + 7 .
+ Return the shortest distance between the given start and destination stops .
+ Given the string word , return the minimum total distance to type such string using only two fingers . The distance between coordinates ( x 1 , y 1 ) and ( x 2 , y 2 ) is | x 1-x 2 | + | y 1-y 2 | .
+ All the friends are divided into pairs . The pairings are given in a list pairs , where pairs [ i ] = [ x i , y i ] denotes x i is paired with y i and y i is paired with x i .
+ undergroundSystem.getAverageTime ( " Paradise " , " Cambridge " ) ; / / return 14.00000 . There was only one travel from " Paradise " ( at time 8 ) to " Cambridge " ( at time 22 )
+ Given an array nums of positive integers . Your task is to select some subset of nums , multiply each element by an integer and add all these numbers . The array is said to be good if you can obtain a sum of 1 from the array by any possible subset and multiplicand .
+ Explanation : Alice will always lose . Her best move will be to take three piles and the score become 6 . Now the score of Bob is 7 and Bob wins .
+ Now , given string arrays queries and words , return an integer array answer , where each answer [ i ] is the number of words such that f ( queries [ i ] ) &lt; f ( W ) , where W is a word in words .
+ You are given a string text of words that are placed among some number of spaces . Each word consists of one or more lowercase English letters and are separated by at least one space . It's guaranteed that text contains at least one word .
+ When we take a comma delimited list of 2 or more expressions , we take the union of possibilities .
+ Calling Successor ( Alice , curOrder ) will return Jack , so we append to curOrder to get [ " king " , " Alice " , " Jack " ] .
+ Explanation : Please take care of the mod .
+ If target is found in the array return its index , otherwise , return-1 .
+ You are given an n x n 2D matrix representing an image , rotate the image by 90 degrees ( clockwise ) .
+ Explanation : The maximum integer in M is 2 , and there are four of it in M . So return 4 .
+ Explanation : Given the above perfect binary tree ( Figure A ) , your function should populate each next pointer to point to its next right node , just like in Figure B . The serialized output is in level order as connected by the next pointers , with' #' signifying the end of each level .
+ 1 . If the file contains less than 10 lines , what should you output ?
+ Given a string representing an expression of fraction addition and subtraction , you need to return the calculation result in string format . The final result should be irreducible fraction . If your final result is an integer , say 2 , you need to change it to the format of fraction that has denominator 1 . So in this case , 2 should be converted to 2/1 .
+ No other pairs satisfy the condition , so we return the max of 4 and 1 .
+ We are given the root of a binary tree with unique values , and the values x and y of two different nodes in the tree .
+ Since the answer may be too large , return it modulo 10 ^ 9 + 7 .
+ The given tree [ 4,2,6,1,3 , null , null ] is represented by the following diagram :
+ You are given two non-empty linked lists representing two non-negative integers . The digits are stored in reverse order , and each of their nodes contains a single digit . Add the two numbers and return the sum as a linked list .
+ Given an integer k , return the minimum number of Fibonacci numbers whose sum is equal to k . The same Fibonacci number can be used multiple times .
+ Explanation : Given the above binary tree ( Figure A ) , your function should populate each next pointer to point to its next right node , just like in Figure B . The serialized output is in level order as connected by the next pointers , with' #' signifying the end of each level .
+ Since the answer may be too large , return it modulo 10 ^ 9 + 7 .
+ The first element output [ 0 ] has output [ 0 ] . val = 1 , output [ 0 ] . next = null .
+ On an 8 x 8 chessboard , there is one white rook . There also may be empty squares , white bishops , and black pawns . These are given as characters' R' ,' .' ,' B' , and' p' respectively . Uppercase characters represent white pieces , and lowercase characters represent black pieces .

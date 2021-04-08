@@ -1,0 +1,14 @@
+ Input points have NO order . No order required for output .
+ For the sample input , the output is :
+ For the example above , the output should be :
+ Given an integer N as input , return the number of' 1's in the first N number in the magical string S .
+ return : 1
+ Given a square at location ( r0 , c0 ) in the grid and a color , color the border of the connected component of that square with the given color , and return the final grid .
+ A string S of lowercase English letters is given . We want to partition this string into as many parts as possible so that each letter appears in at most one part , and return a list of integers representing the size of these parts .
+ The same instance of FooBar will be passed to two different threads . Thread A will call foo ( ) while thread B will call bar ( ) . Modify the given program to output " foobar " n times .
+ For example , given 13 , return : [ 1,10,11,12,13,2,3,4,5,6,7,8,9 ] .
+ It is not necessary to use all characters in letters and each letter can only be used once . Score of letters' a' ,' b' ,' c' , ... ,' z' is given by score [ 0 ] , score [ 1 ] , ... , score [ 25 ] respectively .
+ We write the integers of A and B ( in the order they are given ) on two separate horizontal lines .
+ Then , we go back to the start of the row , giving n + 1 candies to the first person , n + 2 candies to the second person , and so on until we give 2 * n candies to the last person .
+ Given a tree ( i.e. a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges . The root of the tree is the node 0 , and each node of the tree has a label which is a lower-case character given in the string labels ( i.e . The node with the number i has the label labels [ i ] ) .
+ Output : Return 4 , and the first 4 characters of the input array should be : [ " a " , " b " , " 1 " , " 2 " ] .
