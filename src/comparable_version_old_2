@@ -38,6 +38,7 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        ]
 '''
 dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/extra_leetcode_data/"
+dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
 fo = open(dir_path + "sentences", "r+")
 sentence_group = []
 x = fo.readline()
@@ -105,7 +106,7 @@ def recover_sentence(tokens):
 def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
-    #return recover_sentence(tokens)
+    return recover_sentence(tokens)
     print(coref_information)
     target_tokens = tokens.copy()
     #print(target_tokens)
@@ -324,7 +325,7 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
         if dep[0] == 'nmod' and dep[1] == token_index:
             target_index = dep[2]
         elif dep[0] == 'nmod:poss' and dep[1] == token_index:
-            extend_word = tokens[dep[2]] + tokens[dep[2]+1] + '_' + extend_word
+            extend_word = tokens[dep[2]] + '_' + tokens[dep[2]+1] + '_' + extend_word
         elif dep[0] == 'case' and dep[1] == token_index and (tokens[dep[2]] == 'of' or tokens[dep[2]] == 'for' or tokens[dep[2]] == 'from'):
             k = 0
         elif (dep[0] == 'acl' or dep[0] == 'ccomp') and dep[1] == token_index:
@@ -482,7 +483,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[sen_index]
+    sen = sentence_group[4]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
@@ -554,9 +555,9 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
-    #break
-    if sen_index == 107:
-        break
+    break
+    #if sen_index == 10:
+    #    break
     I = []
     O = []
 nlp.close()

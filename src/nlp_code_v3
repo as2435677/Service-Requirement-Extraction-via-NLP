@@ -38,6 +38,7 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        ]
 '''
 dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/extra_leetcode_data/"
+dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
 fo = open(dir_path + "sentences", "r+")
 sentence_group = []
 x = fo.readline()
@@ -881,7 +882,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 #output_modisen = open("./mod_sentence", "w")
 
 for sen_index in range(len(sentence_group)):
-    sen = sentence_group[81]
+    sen = sentence_group[1]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
     pos_tag, dep_parse, tokens = get_pos_dep_token(sen)
     origin_dep_parse = dep_parse.copy()
@@ -985,7 +986,7 @@ for sen_index in range(len(sentence_group)):
     I_group.append(I)
     O_group.append(O)
     break
-    #if sen_index == 80:
+    #if sen_index == 10:
     #    break
     I = []
     O = []
