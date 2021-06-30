@@ -1,0 +1,66 @@
+destCity and DateTime entities
+book title and author, credit card information and the address that the book will be shipped to
+destCity, ArrivalDateTime, and departDateTime
+picture of a barcode of a product and provides his current local position
+PatientID and DeviceAddress; Organisation; blood pressure; level of warning; warning level
+patient ID. Patient ID. patient ID. treatment ID. medication ID
+hotel name, city, and state information
+zip code and food preference
+current location and food preference
+start and destination addresses
+node
+string input representing the file system in the explained format
+integer array of digits
+sequence of words written in the alien language , and the order of the alphabet
+A and B
+string p
+integer N
+locations and height of all the buildings as shown on a cityscape photo
+array
+program
+employee information of a company , and an employee id
+string expression representing a Lisp-like expression
+two 1s
+integer array nums
+chemical formula
+string s
+two positive integers L and R
+array
+Teemo's attacking ascending time series towards Ashe and the poisoning time duration per Teemo's attacking
+square at location in the grid and a color
+string s
+list of unique words
+equation
+integer array destination and an integer k
+list of strings
+input array nums
+total number of courses numCourses and a list of the prerequisite pairs
+integer array arr and a target value target
+node
+A string S of lowercase English letters
+list of daily temperatures T
+root node of a binary search tree and a value
+expression and an evaluation map
+
+all the cities and flights , together with starting city src and the destination dst
+string arrays queries and words
+several projects
+projects
+parameters
+you can eliminate at most k obstacles
+certain items
+string s
+startTime , endTime and profit arrays
+several matchsticks the girl has , represented with their stick length
+two non-empty linked lists representing two non-negative integers
+number N in base-10
+list mines
+string representing n
+array consisting of n integers
+array of integers with possible duplicates
+printNumber method, program
+root of a Binary Search Tree and a target number k
+next click position among all the unrevealed squares
+expression representing a set of words under the given grammar
+2D-array
+string s

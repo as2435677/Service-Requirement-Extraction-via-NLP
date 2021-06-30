@@ -109,7 +109,7 @@ def NNDataProcessing(data, max_len_text = 100):
 
 def PretrainWV(tokenizer, voc, dim = 50):
     embedding_index = dict()
-    file = open(r"../GloVe/glove.6B.300d.txt")
+    file = open(r"../GloVe/glove.6B.100d.txt")
     for line in file:
         values = line.split()
         word = values[0]
@@ -122,85 +122,6 @@ def PretrainWV(tokenizer, voc, dim = 50):
         if embedding_vector is not None:
             embedding_matrix[i] = embedding_vector
     return embedding_matrix    
-
-
-raw_sentences = ReadFile_to_Data(TrainDataPath)
-processed_sentences = Cleaner(raw_sentences)
-
-label_data = ReadFile_to_Data(TrainDataPath, 'NN_I')
-processed_label_data = Cleaner(label_data)
-processed_label_data = processed_label_data.rename(columns={"sentences": "tuple_based_information"})
-processed_label_data['tuple_based_information'] = processed_label_data['tuple_based_information'].apply(lambda x: 'sostok ' + x + ' eostok')
-#train_data = pd.concat([processed_sentences, processed_label_data], axis = 1)
-x_train, y_train = np.array(processed_sentences).flatten(), np.array(processed_label_data).flatten()
-
-max_len_text = 80
-embedding_dim = 300
-x_train, x_voc_number, x_tokenizer = NNDataProcessing(x_train, max_len_text)
-x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
-y_train, y_voc_number, y_tokenizer = NNDataProcessing(y_train, max_len_text)
-y_emb_matrix = PretrainWV(y_tokenizer, y_voc_number, embedding_dim)
-
-latent_dim = 300
-#embedding_dim = 100
-
-encoder_inputs = Input(shape=(max_len_text, ))
-#enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
-enc_emb = Embedding(x_voc_number, embedding_dim, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
-
-encoder_lstm1 = LSTM(latent_dim, return_sequences=True, return_state=True)
-encoder_output1, state_h1, state_c1 = encoder_lstm1(enc_emb)
-
-encoder_lstm2 = LSTM(latent_dim, return_sequences=True, return_state=True)
-encoder_output2, state_h2, state_c2 = encoder_lstm2(encoder_output1)
-
-encoder_lstm3 = LSTM(latent_dim, return_sequences=True, return_state=True)
-encoder_outputs, state_h, state_c = encoder_lstm2(encoder_output2)
-
-
-decoder_inputs = Input(shape=(None, ))
-#dec_emb_layer = Embedding(y_voc_number, embedding_dim, trainable=True)
-dec_emb_layer = Embedding(y_voc_number, embedding_dim, weights=[y_emb_matrix], trainable=False)
-dec_emb = dec_emb_layer(decoder_inputs)
-decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True)
-decoder_outputs, decoder_fwd_state, decoder_back_state = decoder_lstm(dec_emb, initial_state=[state_h, state_c])
-decoder_dense = TimeDistributed(Dense(y_voc_number, activation='softmax'))
-decoder_outputs = decoder_dense(decoder_outputs)
-model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
-
-model.summary()
-from keras import backend as K 
-K.clear_session()
-
-model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy')
-history = model.fit(
-    [x_train, y_train[:, :-1]],
-    y_train.reshape(y_train.shape[0], y_train.shape[1], 1)[:, 1:],
-    epochs=200,
-    batch_size=8,
-    )
-
-reverse_target_word_index = y_tokenizer.index_word
-reverse_source_word_index = x_tokenizer.index_word
-target_word_index = y_tokenizer.word_index
-
-encoder_model = Model(inputs=encoder_inputs, outputs=[encoder_outputs,state_h, state_c])
-# Below tensors will hold the states of the previous time step
-decoder_state_input_h = Input(shape=(latent_dim, ))
-decoder_state_input_c = Input(shape=(latent_dim, ))
-decoder_hidden_state_input = Input(shape=(max_len_text, latent_dim))
-
-# Get the embeddings of the decoder sequence
-dec_emb2 = dec_emb_layer(decoder_inputs)
-
-# To predict the next word in the sequence, set the initial states to the states from the previous time step
-(decoder_outputs2, state_h2, state_c2) = decoder_lstm(dec_emb2,initial_state=[decoder_state_input_h, decoder_state_input_c])
-
-# A dense softmax layer to generate prob dist. over the target vocabulary
-decoder_outputs2 = decoder_dense(decoder_outputs2)
-
-# Final decoder model
-decoder_model = Model(inputs = ([decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c]), outputs = ([decoder_outputs2] + [state_h2, state_c2]))
 
 def decode_sequence(input_seq):
 
@@ -239,6 +160,140 @@ def decode_sequence(input_seq):
         (e_h, e_c) = (h, c)
 
     return decoded_sentence
+
+
+raw_sentences = ReadFile_to_Data(TrainDataPath, "sentences_test3")
+processed_sentences = Cleaner(raw_sentences)
+
+label_data = ReadFile_to_Data(TrainDataPath, 'NN_I_test3')
+processed_label_data = Cleaner(label_data)
+processed_label_data = processed_label_data.rename(columns={"sentences": "tuple_based_information"})
+processed_label_data['tuple_based_information'] = processed_label_data['tuple_based_information'].apply(lambda x: 'sostok ' + x + ' eostok')
+#train_data = pd.concat([processed_sentences, processed_label_data], axis = 1)
+x_train, y_train = np.array(processed_sentences).flatten(), np.array(processed_label_data).flatten()
+es = EarlyStopping(monitor='loss', min_delta=0.001, patience=3, verbose=1)
+
+max_len_text = 80
+embedding_dim = 100
+x_train, x_voc_number, x_tokenizer = NNDataProcessing(x_train, max_len_text)
+x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
+y_train, y_voc_number, y_tokenizer = NNDataProcessing(y_train, max_len_text)
+y_emb_matrix = PretrainWV(y_tokenizer, y_voc_number, embedding_dim)
+
+latent_dim = 300
+#embedding_dim = 100
+
+encoder_inputs = Input(shape=(max_len_text, ))
+#enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
+enc_emb = Embedding(x_voc_number, embedding_dim, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
+
+encoder_lstm1 = LSTM(latent_dim, return_sequences=True, return_state=True)
+encoder_output1, state_h1, state_c1 = encoder_lstm1(enc_emb)
+
+encoder_lstm2 = LSTM(latent_dim, return_sequences=True, return_state=True)
+encoder_output2, state_h2, state_c2 = encoder_lstm2(encoder_output1)
+
+encoder_lstm3 = LSTM(latent_dim, return_sequences=True, return_state=True)
+encoder_outputs, state_h, state_c = encoder_lstm2(encoder_output2)
+
+
+decoder_inputs = Input(shape=(None, ))
+#dec_emb_layer = Embedding(y_voc_number, embedding_dim, trainable=True)
+dec_emb_layer = Embedding(y_voc_number, embedding_dim, weights=[y_emb_matrix], trainable=False)
+dec_emb = dec_emb_layer(decoder_inputs)
+decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True)
+decoder_outputs, decoder_fwd_state, decoder_back_state = decoder_lstm(dec_emb, initial_state=[state_h, state_c])
+decoder_dense = TimeDistributed(Dense(y_voc_number, activation='softmax'))
+decoder_outputs = decoder_dense(decoder_outputs)
+#model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+
+#model.summary()
+from keras import backend as K 
+K.clear_session()
+model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+model.summary()
+
+
+model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy')
+history = model.fit(
+    [x_train, y_train[:, :-1]],
+    y_train.reshape(y_train.shape[0], y_train.shape[1], 1)[:, 1:],
+    epochs=500,
+    batch_size=6,
+    )
+
+reverse_target_word_index = y_tokenizer.index_word
+reverse_source_word_index = x_tokenizer.index_word
+target_word_index = y_tokenizer.word_index
+
+encoder_model = Model(inputs=encoder_inputs, outputs=[encoder_outputs,state_h, state_c])
+# Below tensors will hold the states of the previous time step
+decoder_state_input_h = Input(shape=(latent_dim, ))
+decoder_state_input_c = Input(shape=(latent_dim, ))
+decoder_hidden_state_input = Input(shape=(max_len_text, latent_dim))
+
+# Get the embeddings of the decoder sequence
+dec_emb2 = dec_emb_layer(decoder_inputs)
+
+# To predict the next word in the sequence, set the initial states to the states from the previous time step
+(decoder_outputs2, state_h2, state_c2) = decoder_lstm(dec_emb2,initial_state=[decoder_state_input_h, decoder_state_input_c])
+
+# A dense softmax layer to generate prob dist. over the target vocabulary
+decoder_outputs2 = decoder_dense(decoder_outputs2)
+
+# Final decoder model
+decoder_model = Model(inputs = [decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c], outputs = [decoder_outputs2] + [state_h2, state_c2])
+temp = []
 for i in range(20):
     print(str(i+1))
-    print(decode_sequence(x_train[i].reshape(1,max_len_text)))
+    temp.append(decode_sequence(x_train[i].reshape(1,max_len_text)))
+    print(temp[i])
+#result.append(temp)
+del temp
+'''
+def decode_sequence(input_seq):
+
+    # Encode the input as state vectors.
+    (e_out, e_h, e_c) = encoder_model.predict(input_seq)
+
+    # Generate empty target sequence of length 1
+    target_seq = np.zeros((1, 1))
+
+    # Populate the first word of target sequence with the start word.
+    target_seq[0, 0] = target_word_index['sostok']
+
+    stop_condition = False
+    decoded_sentence = ''
+
+    while not stop_condition:
+        (output_tokens, h, c) = decoder_model.predict([target_seq]
+                + [e_out, e_h, e_c])
+
+        # Sample a token
+        sampled_token_index = np.argmax(output_tokens[0, -1, :])
+        sampled_token = reverse_target_word_index[sampled_token_index]
+
+        if sampled_token != 'eostok':
+            decoded_sentence += ' ' + sampled_token
+
+        # Exit condition: either hit max length or find the stop word.
+        if sampled_token == 'eostok' or len(decoded_sentence.split()) >= max_len_text - 1:
+            stop_condition = True
+
+        # Update the target sequence (of length 1)
+        target_seq = np.zeros((1, 1))
+        target_seq[0, 0] = sampled_token_index
+
+        # Update internal states
+        (e_h, e_c) = (h, c)
+
+    return decoded_sentence
+
+    temp = []
+    for i in range(20):
+        print(str(i+1))
+        temp.append(decode_sequence(x_train[i].reshape(1,max_len_text)))
+        print(temp[i])
+    result.append(temp)
+    del temp
+    '''
