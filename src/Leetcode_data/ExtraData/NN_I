@@ -1,0 +1,145 @@
+
+arrays
+two non-negative integers num1 and num2 represented as string
+
+
+integer array nums
+N x N grid containing only values 0 and 1
+
+integer number n
+m * n matrix mat and an integer K
+tree
+array
+list of three points in the plane
+
+
+
+integer array cardPoints and the integer k
+fork on their right or the one on their left as they become available
+timestamp
+integer n representing the number of courses at some university labeled from 1 to n , and the array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship, integer k
+num
+sequence of books
+list of queries , and a pattern
+binary tree
+string
+initial computer network connections
+two arrays of integers nums1 and nums2
+2D-array
+list G
+array of integers A sorted in non-decreasing order
+tree
+
+
+integer array nums 
+
+input string ( s ) and a pattern ( p )
+array of variable pairs equations and an array of real numbers values
+list of words
+
+positive integer num
+array
+rules
+non-negative integer n which represents the number of LEDs that are currently on
+matrix of M x N elements
+integer n and the array roads
+set of pairs
+
+node
+
+binary tree
+
+
+two anagrams A and B
+lower and upper number bound
+
+bucket
+
+2D char matrix representing the game board
+string S, array widths
+head of a linked list
+VPS represented as string s
+integer array A , and an integer target
+root node
+array
+array of distinct positive integers locations where locations [ i ] represents the position of city i, integers start , finish and fuel representing the starting city , ending city , and the initial amount of fuel you have
+heights , a 2D array of size rows x columns
+
+following tree
+K eggs
+real file system
+board
+
+range [ m , n ]
+
+
+
+list of their ages
+
+matrix
+
+order
+array of distinct integers arr and an array of integer arrays pieces
+array nums
+
+
+tree ( ie a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges, string labels
+two arrays of integers with equal lengths
+N * N matrix M representing the friend relationship between students in the class
+integer n
+target value to search
+
+rows x cols matrix grid
+string s
+m x n 2d grid map of' 1' s ( land ) and' 0' s
+
+
+starting string start and the ending string end
+root node reference of a BST and a key
+A mapping of digit to letters
+
+array of network towers towers and an integer radius
+string s of even length consisting of digits from 0 to 9 , and two integers a and b
+
+non-empty binary tree
+array
+n
+
+
+points
+sample
+
+13
+Score of letters
+n + 1 candies to the first person , n + 2 candies to the second person , and so on until we give 2 * n candies to the last person
+
+root of a binary tree
+bounds
+
+
+binary tree
+
+mails
+
+
+array
+
+
+integer maxCost
+r and c are all positive
+array
+The number of slots for each parking space
+
+
+undirected graph
+above Logs table
+numbers
+numbers
+
+list
+
+directed graph
+discount equivalent to prices
+N
+2D binary array A
+strings consist of lowercase English characters only
