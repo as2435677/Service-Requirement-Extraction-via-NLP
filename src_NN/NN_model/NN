@@ -228,13 +228,13 @@ x_test, y_test = np.array(processed_test_sentences).flatten(), np.array(processe
 
 
 max_len_text = 80
-embedding_dim = 2676
+embedding_dim = 100
 x_train, x_voc_number, x_tokenizer = NNDataProcessing(x_train, max_len_text)
-#x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
-x_emb_matrix = one_hot_encoding(x_tokenizer, x_voc_number, embedding_dim)
+x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
+#x_emb_matrix = one_hot_encoding(x_tokenizer, x_voc_number, embedding_dim)
 y_train, y_voc_number, y_tokenizer = NNDataProcessing(y_train, max_len_text)
-#y_emb_matrix = PretrainWV(y_tokenizer, y_voc_number, embedding_dim)
-y_emb_matrix = one_hot_encoding(y_tokenizer, y_voc_number, embedding_dim)
+y_emb_matrix = PretrainWV(y_tokenizer, y_voc_number, embedding_dim)
+#y_emb_matrix = one_hot_encoding(y_tokenizer, y_voc_number, embedding_dim)
 
 #test
 x_test_ori = TestDataProcessing(x_test, x_tokenizer, max_len_text)
@@ -247,8 +247,8 @@ latent_dim = 300
 #embedding_dim = 100
 
 encoder_inputs = Input(shape=(max_len_text, ))
-enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
-#enc_emb = Embedding(x_voc_number, x_voc_number, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
+#enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
+enc_emb = Embedding(x_voc_number, embedding_dim, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
 
 encoder_lstm1 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
 encoder_output1, state_h1, state_c1 = encoder_lstm1(enc_emb)
@@ -261,8 +261,8 @@ encoder_outputs, state_h, state_c = encoder_lstm2(encoder_output2)
 
 
 decoder_inputs = Input(shape=(None, ))
-dec_emb_layer = Embedding(y_voc_number, embedding_dim, trainable=True)
-#dec_emb_layer = Embedding(y_voc_number, y_voc_number, weights=[y_emb_matrix], trainable=False)
+#dec_emb_layer = Embedding(y_voc_number, embedding_dim, trainable=True)
+dec_emb_layer = Embedding(y_voc_number, embedding_dim, weights=[y_emb_matrix], trainable=False)
 dec_emb = dec_emb_layer(decoder_inputs)
 decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
 decoder_outputs, decoder_fwd_state, decoder_back_state = decoder_lstm(dec_emb, initial_state=[state_h, state_c])

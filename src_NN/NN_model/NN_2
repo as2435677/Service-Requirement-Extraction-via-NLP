@@ -223,6 +223,9 @@ processed_label_data['tuple_based_information'] = processed_label_data['tuple_ba
 #train_data = pd.concat([processed_sentences, processed_label_data], axis = 1)
 x, y = np.array(processed_sentences).flatten(), np.array(processed_label_data).flatten()
 x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size = 0.1, random_state = 0)
+veri_label = y_train
+veri_label = pd.DataFrame(veri_label)
+veri_label = veri_label.rename(columns= {0:"tuple_based_information"})
 es = EarlyStopping(monitor='loss', min_delta=0.001, patience=3, verbose=1)
 
 #test
@@ -241,7 +244,7 @@ x_test, y_test = np.array(processed_test_sentences).flatten(), np.array(processe
 max_len_text = 80
 embedding_dim = 100
 x_train, x_voc_number, x_tokenizer = NNDataProcessing(x_train, max_len_text)
-#x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
+x_emb_matrix = PretrainWV(x_tokenizer, x_voc_number, embedding_dim)
 #x_emb_matrix = one_hot_encoding(x_tokenizer, x_voc_number, embedding_dim)
 #y_train, y_voc_number, y_tokenizer = NNDataProcessing(y_train, max_len_text)
 y_train = TestDataProcessing(y_train, x_tokenizer, max_len_text)
@@ -264,24 +267,24 @@ latent_dim = 300
 #embedding_dim = 100
 
 encoder_inputs = Input(shape=(max_len_text, ))
-enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
-#enc_emb = Embedding(x_voc_number, x_voc_number, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
+#enc_emb = Embedding(x_voc_number, embedding_dim, trainable=True)(encoder_inputs)
+enc_emb = Embedding(x_voc_number, embedding_dim, weights=[x_emb_matrix], trainable=False)(encoder_inputs)
 
-encoder_lstm1 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
+encoder_lstm1 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0.4, kernel_regularizer=(regularizers.l2(0)))
 encoder_output1, state_h1, state_c1 = encoder_lstm1(enc_emb)
 
-encoder_lstm2 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
+encoder_lstm2 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0.4, kernel_regularizer=(regularizers.l2(0)))
 encoder_output2, state_h2, state_c2 = encoder_lstm2(encoder_output1)
 
-encoder_lstm3 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
+encoder_lstm3 = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0.4, kernel_regularizer=(regularizers.l2(0)))
 encoder_outputs, state_h, state_c = encoder_lstm2(encoder_output2)
 
 
 decoder_inputs = Input(shape=(None, ))
-dec_emb_layer = Embedding(x_voc_number, embedding_dim, trainable=True)
-#dec_emb_layer = Embedding(y_voc_number, y_voc_number, weights=[y_emb_matrix], trainable=False)
+#dec_emb_layer = Embedding(x_voc_number, embedding_dim, trainable=True)
+dec_emb_layer = Embedding(x_voc_number, embedding_dim, weights=[x_emb_matrix], trainable=False)
 dec_emb = dec_emb_layer(decoder_inputs)
-decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0, kernel_regularizer=(regularizers.l2(0)))
+decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True, dropout=0.4, kernel_regularizer=(regularizers.l2(0)))
 decoder_outputs, decoder_fwd_state, decoder_back_state = decoder_lstm(dec_emb, initial_state=[state_h, state_c])
 decoder_dense = TimeDistributed(Dense(x_voc_number, activation='softmax'))
 decoder_outputs = decoder_dense(decoder_outputs)
@@ -298,7 +301,7 @@ model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy')
 history = model.fit(
     [x_train, y_train[:, :-1]],
     y_train.reshape(y_train.shape[0], y_train.shape[1], 1)[:, 1:],
-    epochs=500,
+    epochs=1000,
     batch_size=6,
     validation_data=([x_valid,y_valid[:,:-1]],y_valid.reshape(y_valid.shape[0], y_valid.shape[1],1)[:,1:])
     )
@@ -323,8 +326,8 @@ dec_emb2 = dec_emb_layer(decoder_inputs)
 decoder_outputs2 = decoder_dense(decoder_outputs2)
 
 # Final decoder model
-model_i = ([decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c])
-model_o = ([decoder_outputs2] + [state_h2, state_c2])
+model_i = [decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c]
+model_o = [decoder_outputs2] + [state_h2, state_c2]
 decoder_model = Model(inputs = model_i, outputs = model_o)
 
 #decoder_model = Model(inputs = [decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c], outputs = [decoder_outputs2] + [state_h2, state_c2])
@@ -342,7 +345,7 @@ for i in range(len(x_test)):
     temp_test.append(decode_sequence(x_test[i].reshape(1,max_len_text)))
     #print(temp_test[i])
     
-print("Train acc: %f" % calculate_accuracy(temp, processed_label_data))
+print("Train acc: %f" % calculate_accuracy(temp, veri_label))
 print("Test acc: %f" % calculate_accuracy(temp_test, processed_test_label_data))
 '''
 def decode_sequence(input_seq):
