@@ -122,48 +122,58 @@ fo_new_sen = open("./augmentation_data", "w")
 fo_new_label = open("./augmentation_data_label", "w")
 augmentation_data = []
 augmentation_label = []
-for i in range(len(sentence_group)):
-    original_sen = nlp.word_tokenize(sentence_group[i])
-    original_label = nlp.word_tokenize(label_group[i])
-    new_sen = []
-    new_label = []
-    pos_tag = nlp.pos_tag(sentence_group[i])
-    pos_tag_len = len(pos_tag)
-    label_len = len(original_label)
-    j = 0
-    k = 0
-    while j < pos_tag_len:
-        if j < label_start_index[i][1]:
-            new_sen.append(pos_tag[j][0])
-            j += 1
-        elif pos_tag[j][1] == 'NN' or pos_tag[j][1] == 'NNS' or pos_tag[j][1] == 'NNP' or pos_tag[j][1] == 'NNPS':
-            noun = pos_tag[j][0]
-            if noun in input_relateword_sets or noun in output_relateword_sets:
-                new_sen.append(noun)
+for iteration in range(10):
+    for i in range(len(sentence_group)):
+        original_sen = nlp.word_tokenize(sentence_group[i])
+        original_label = nlp.word_tokenize(label_group[i])
+        new_sen = []
+        new_label = []
+        pos_tag = nlp.pos_tag(sentence_group[i])
+        pos_tag_len = len(pos_tag)
+        label_len = len(original_label)
+        j = 0
+        k = 0
+        while j < pos_tag_len:
+            if (i == 4 or i == 5 or i == 60) and (pos_tag[j][0] == "." or pos_tag[j][0] == ";"):
+                new_sen.append(pos_tag[j][0])
+                break
+            if j < label_start_index[i][1] or j >= label_start_index[i][1] + label_len:
+                new_sen.append(pos_tag[j][0])
                 j += 1
-                continue
-            while j < pos_tag_len and (pos_tag[j+1][1] == 'NN' or pos_tag[j+1][1] == 'NNS' or pos_tag[j+1][1] == 'NNP' or pos_tag[j+1][1] == 'NNPS'):
-                noun = noun + " " + pos_tag[j+1][0]
+            elif pos_tag[j][1] == 'NN' or pos_tag[j][1] == 'NNS' or pos_tag[j][1] == 'NNP' or pos_tag[j][1] == 'NNPS':
+                noun = pos_tag[j][0]
+                if noun in input_relateword_sets or noun in output_relateword_sets:
+                    new_sen.append(noun)
+                    j += 1
+                    if original_label[k] != ";":
+                        new_label.append(noun)
+                        k += 1
+                    continue
+                while j < pos_tag_len and (pos_tag[j+1][1] == 'NN' or pos_tag[j+1][1] == 'NNS' or pos_tag[j+1][1] == 'NNP' or pos_tag[j+1][1] == 'NNPS'):
+                    noun = noun + " " + pos_tag[j+1][0]
+                    j += 1
+                    k += 1
+                    
+                new_noun = replace_noun(noun, noun_bank)
+                #if k < label_len:
+                if j < label_start_index[i][1] + label_len and original_label[k] != ";":
+                    new_label.append(new_noun)
+                    k += 1
+                new_sen.append(new_noun)
                 j += 1
-            new_noun = replace_noun(noun, noun_bank)
-            #if k < label_len:
-            if j < label_start_index[i][1] + label_len:
-                new_label.append(new_noun)
-                k += 1
-            new_sen.append(new_noun)
-            j += 1
-        else:
-            #if k < label_len:
-            if j < label_start_index[i][1] + label_len:
-                new_label.append(pos_tag[j][0])
-                k += 1
-            new_sen.append(pos_tag[j][0])
-            j += 1
-    augmentation_data.append(" ".join(new_sen))
-    augmentation_label.append(" ".join(new_label))
-    fo_new_sen.write(" ".join(new_sen) + "\n")
-    fo_new_label.write(" ".join(new_label) + "\n")
-
+            else:
+                #if k < label_len:
+                if j < label_start_index[i][1] + label_len and original_label[k] != ";":
+                    new_label.append(pos_tag[j][0])
+                    k += 1
+                new_sen.append(pos_tag[j][0])
+                j += 1
+        augmentation_data.append(" ".join(new_sen))
+        augmentation_label.append(" ".join(new_label))
+        fo_new_sen.write(" ".join(new_sen) + "\n")
+        fo_new_label.write(" ".join(new_label) + "\n")
+        #break
+    #break
 
 nlp.close()
 fo_new_sen.close()
