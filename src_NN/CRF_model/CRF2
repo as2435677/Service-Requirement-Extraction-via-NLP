@@ -18,6 +18,7 @@ import pycrfsuite
 import sklearn_crfsuite
 from nltk.stem import WordNetLemmatizer
 import sys
+from collections import Counter
 
 
 TrainDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/Data_augmentation/"
@@ -340,21 +341,16 @@ for i in range(108):
 print("Testing Accuracy: " + str(Correct/108))
 
 def fault_type(fault, prediction):
-    empty_error = []
-    lack_words_error = []
+    fault_error = []
     for index in fault:
         if prediction[index] == "":
-            empty_error.append(index)
+            fault_error.append(0)
         else:
-            lack_words_error.append(index)
-    return empty_error, lack_words_error
-
-empty_error = []
-lack_words_error = []
-
-empty_error, lack_words_error = fault_type(fault, answer)
+            fault_error.append(1)
+    return fault_error
 
 
+fault_error = fault_type(fault, answer)
 
 
 
@@ -411,6 +407,25 @@ isGiven_nsubjpass_NN = [40]
 given_mark_VB = [50]
 given_acl_NN = [51]
 given_obj_NN = [52]
+inputNN_compound_NN = []
+
+training_classification_result = (
+    receive_obj_NN,
+    provide_obj_NN,
+    take_obj_NN,
+    given_case_NN,
+    given_amod_NN,
+    inputNN_nsubj_NN,
+    areGiven_obj_NN,
+    NowGiven_obj_NN,
+    NowGiven_iobj_NN,
+    inputNN_nmod_NN,
+    isGiven_nsubjpass_NN,
+    given_mark_VB,
+    given_acl_NN,
+    given_obj_NN,
+    inputNN_compound_NN
+    )
 
 #Testing Data Index (need to -1 for 0-index)
 t_receive_obj_NN = []
@@ -429,5 +444,95 @@ t_given_mark_VB = []
 t_given_acl_NN = [81]
 t_given_obj_NN = []
 t_inputNN_compound_NN = [2,28,41,64,71]
+
+testing_classification_result = (
+    t_receive_obj_NN,
+    t_provide_obj_NN,
+    t_take_obj_NN,
+    t_given_case_NN,
+    t_given_amod_NN,
+    t_inputNN_nsubj_NN,
+    t_areGiven_obj_NN,
+    t_NowGiven_obj_NN,
+    t_NowGiven_iobj_NN,
+    t_inputNN_nmod_NN,
+    t_isGiven_nsubjpass_NN,
+    t_given_mark_VB,
+    t_given_acl_NN,
+    t_given_obj_NN,
+    t_inputNN_compound_NN
+    )
+
+def classify_error(fault, mode):
+    classification_result = []
+    if mode == 0:
+        flag = 0
+        for error in fault:
+            for index in range(len(training_classification_result)):
+                if error in training_classification_result[index]:
+                    flag = 1
+                    classification_result.append(index)
+                    break
+            if flag == 0:
+                classification_result.append(15)
+            else:
+                flag = 0
+    else:
+        flag = 0
+        for error in fault:
+            for index in range(len(testing_classification_result)):
+                if error in testing_classification_result[index]:
+                    flag = 1
+                    classification_result.append(index)
+                    break
+            if flag == 0:
+                classification_result.append(15)
+            else:
+                flag = 0
+                
+    return classification_result
+
+cr = classify_error(fault, 1)
+
+
+classfication_index_pair = {
+    0:"receive_obj_NN",
+    1:"provide_obj_NN",
+    2:"take_obj_NN",
+    3:"given_case_NN",
+    4:"given_amod_NN",
+    5:"inputNN_nsubj_NN",
+    6:"areGiven_obj_NN",
+    7:"NowGiven_obj_NN",
+    8:"NowGiven_iobj_NN",
+    9:"inputNN_nmod_NN",
+    10:"isGiven_nsubjpass_NN",
+    11:"given_mark_VB",
+    12:"given_acl_NN",
+    13:"given_obj_NN",
+    14:"inputNN_compound_NN",
+    15:"No need output"
+    }
+
+empty_index_pair = {
+    0:"empty",
+    1:"Non-empty"
+    }
+
+def drawPie(classification_result, mode = 0):
+    cal_total_occurence = Counter(classification_result)
+    target = []
+    value = []
+    for key, val in cal_total_occurence.items():
+        if mode == 0:
+            target.append(classfication_index_pair[key])
+        else:
+            target.append(empty_index_pair[key])
+        value.append(val)
+    plt.pie(value, labels = target, autopct="%1.1f%%")
+    plt.axis('equal')
+    plt.show()
+    
+
 
 nlp.close()
