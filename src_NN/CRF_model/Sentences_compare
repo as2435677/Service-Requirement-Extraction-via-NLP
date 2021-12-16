@@ -1,0 +1,29 @@
+Both input arrays are non-empty and have the same length .
+Given two non-negative integers num1 and num2 represented as string , return the sum of num1 and num2 .
+Here is a diagram of the given tree :
+Stores the key and value , along with the given timestamp .
+The given num does not contain any leading zero .
+The given binary tree will have between 1 and 3000 nodes .
+The number of nodes in the given tree is less than 4096 .
+Note that the input array is passed in by reference , which means a modification to the input array will be known to the caller as well .
+It is guaranteed that answer is unique under the given rules .
+Given a non-negative integer n which represents the number of LEDs that are currently on , return all possible times the watch could represent .
+The Graph is connected and all nodes can be visited starting from the given node .
+Any given bucket can be sampled an infinite number of times .
+We are to write the letters of a given string S , from left to right into lines . Each line has maximum width 100 units , and if writing a letter would cause the width of the line to exceed 100 units , it is written on the next line . We are given an array widths , an array where widths [ 0 ] is the width of' a' , widths [ 1 ] is the width of' b' , ... , and widths [ 25 ] is the width of' z' .
+You may assume k is always valid , ie : k is always smaller than input array's size for non-empty array .
+You are a hiker preparing for an upcoming hike . You are given heights , a 2D array of size rows x columns , where heights [ row ] [ col ] represents the height of cell . You are situated in the top-left cell , , and you hope to travel to the bottom-right cell , . You can move up , down , left , or right , and you wish to find a route that requires the minimum effort .
+For example , given the following tree :
+Imagine you are given a real file system , how will you search files ? DFS or BFS ?
+The input board won't be a stage when game is over .
+Given a range [ m , n ] where 0 &lt; = m &lt; = n &lt; = 2147483647 , return the bitwise AND of all numbers in this range , inclusive .
+Return the minimum number of moves to transform the given array nums into a zigzag array .
+Some people will make friend requests . The list of their ages is given and ages [ i ] is the age of the ith person .
+Note that the cargo must be shipped in the order given , so using a ship of capacity 14 and splitting the packages into parts like , , , , is not allowed .
+**Given two arrays of integers with equal lengths , return the maximum value of :
+Given a N * N matrix M representing the friend relationship between students in the class . If M [ i ] [ j ] = 1 , then the i th and j th students are direct friends with each other , otherwise not . And you have to output the total number of friend circles among all the students .
+You are given a target value to search . If found in the array return true , otherwise return false .
+You are given a rows x cols matrix grid . Initially , you are located at the top-left corner , and in each step , you can only move right or down in the matrix .
+Given an input string s , reverse the order of the words .
+A mapping of digit to letters is given below . Note that 1 does not map to any letters .
+Given n , return the value of T n .

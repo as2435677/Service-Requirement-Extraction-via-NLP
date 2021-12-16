@@ -9,9 +9,11 @@ Created on Wed Aug 18 13:29:50 2021
 from stanfordcorenlp import StanfordCoreNLP
 import random
 import re
+from nltk.stem import WordNetLemmatizer
 
+random.seed(0)
 nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
-
+lemmatizer = WordNetLemmatizer()
 
 #input and output keywords sets
 input_relateword_sets = [
@@ -142,7 +144,7 @@ for iteration in range(10):
                 j += 1
             elif pos_tag[j][1] == 'NN' or pos_tag[j][1] == 'NNS' or pos_tag[j][1] == 'NNP' or pos_tag[j][1] == 'NNPS':
                 noun = pos_tag[j][0]
-                if noun in input_relateword_sets or noun in output_relateword_sets:
+                if lemmatizer.lemmatize(noun, pos="v").lower() in input_relateword_sets or lemmatizer.lemmatize(noun, pos="v").lower() in output_relateword_sets:
                     new_sen.append(noun)
                     j += 1
                     if original_label[k] != ";":

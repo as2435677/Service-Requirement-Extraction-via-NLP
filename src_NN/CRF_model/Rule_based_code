@@ -14,6 +14,7 @@ from nltk.stem import WordNetLemmatizer
 from operator import is_not
 from functools import partial 
 import os
+import re
 
 #Tool Announcement
 nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
@@ -37,19 +38,44 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        "The total price of the composite service execution should be at most $500."
        ]
 '''
+
+def SentencesProcessing(raw_sentences):
+    #new_sentences = raw_sentences.lower()
+    new_sentences = re.sub(r'\([^)]*\)', '', raw_sentences)
+    new_sentences = re.sub(r"\n","", new_sentences)
+    #new_sentences = re.sub('"','', new_sentences)
+    #tokens = [w for w in new_sentences.split() if not w in stop_words]
+    #new_sentences = re.sub("[^a-zA-Z]", " ", new_sentences) 
+    long_words=[]
+    for i in new_sentences.split():
+        long_words.append(i)   
+    return (" ".join(long_words)).strip()
+
+def Read_Sentences(dir_path, filename = 'sentences'):
+    file = open(dir_path + filename, "r+")
+    sentence_group = []
+    x = file.readline()
+    while(x != ""):
+        sentence_group.append(SentencesProcessing(x))
+        x = file.readline()
+    file.close()
+    return sentence_group
+
+
+
 TrainDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/Data_augmentation/"
 TestDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/ExtraData/"
 #dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/extra_leetcode_data/"
 #dir_path = "/home/ken/git_nlp/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/"
 dir_path = TrainDataPath
 #fo = open(dir_path + "sentences", "r+")
-fo = open(dir_path + "sentences_test3", "r+")
+#fo = open(dir_path + "sentences_test3", "r+")
 sentence_group = []
-x = fo.readline()
-while(x != ""):
-    sentence_group.append(x)
-    x = fo.readline()
-
+#x = fo.readline()
+#while(x != ""):
+#    sentence_group.append(x)
+#    x = fo.readline()
+sentence_group = Read_Sentences(TrainDataPath, "sentences_test3")
 
 #input and output keywords sets
 input_relateword_sets = [
@@ -79,7 +105,9 @@ E = []
 
 I_group = []
 O_group = []
-               
+            
+
+
 #Get pos_tag, dependency and token
 def get_pos_dep_token(sen):
     pos_tag = nlp.pos_tag(sen)
@@ -245,10 +273,10 @@ def modify_sentence(tokens, pos_tag):
     mod_token = nlp.word_tokenize(sen)
     mod_token.insert(0,'ROOT')
     #print(sen)
-    for tag in pos_tag:
-        if tag[1] == 'PRP' or tag[1] == 'PRP$':
-            sen = de_coreference(sen, mod_token)
-            break
+    #for tag in pos_tag:
+    #    if tag[1] == 'PRP' or tag[1] == 'PRP$':
+    #        sen = de_coreference(sen, mod_token)
+    #        break
     
     return sen
 
@@ -658,7 +686,8 @@ def find_of_information(token_index, dep_parse, tokens, pos_tag, keywords):
                 extend_word = details + recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
                 flag = 0
             else:
-                extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+                #extend_word = recover_compound(target_index, dep_parse, tokens, pos_tag) + "_" + previous_words
+                extend_word = previous_words + '_' +tokens[dep[2]]+ '_' + recover_compound(target_index, dep_parse, tokens, pos_tag)
                 if details2 != "":
                     extend_word = extend_word + details2
                     details2 = ""
@@ -989,7 +1018,7 @@ for sen_index in range(len(sentence_group)):
     #input()
     I_group.append(I)
     O_group.append(O)
-    break
+    #break
     #if sen_index == 10:
     #    break
     I = []

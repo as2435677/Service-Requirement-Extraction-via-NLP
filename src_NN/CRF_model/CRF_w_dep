@@ -1,0 +1,393 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun  7 15:40:07 2021
+
+@author: ken
+"""
+
+from stanfordcorenlp import StanfordCoreNLP
+import numpy as np
+import pandas as pd
+import re
+from nltk.corpus import stopwords
+import warnings
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+import pycrfsuite
+import sklearn_crfsuite
+from nltk.stem import WordNetLemmatizer
+import sys
+
+
+TrainDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/Data_augmentation/"
+TestDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/ExtraData/"
+PreTrain_WV_Path = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/GloVe/"
+
+nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
+lemmatizer = WordNetLemmatizer()
+
+
+input_relateword_sets = [
+    "input",
+    "given",
+    "give",
+    "provide",
+    "receive",
+    "take"
+    ]
+
+
+
+def SentencesProcessing(raw_sentences):
+    #new_sentences = raw_sentences.lower()
+    new_sentences = re.sub(r'\([^)]*\)', '', raw_sentences)
+    new_sentences = re.sub(r"\n","", new_sentences)
+    #new_sentences = re.sub('"','', new_sentences)
+    #tokens = [w for w in new_sentences.split() if not w in stop_words]
+    #new_sentences = re.sub("[^a-zA-Z]", " ", new_sentences) 
+    long_words=[]
+    for i in new_sentences.split():
+        long_words.append(i)   
+    return (" ".join(long_words)).strip()
+
+def Read_Sentences(dir_path, filename = 'sentences'):
+    file = open(dir_path + filename, "r+")
+    sentence_group = []
+    x = file.readline()
+    while(x != ""):
+        sentence_group.append(SentencesProcessing(x))
+        x = file.readline()
+    file.close()
+    return sentence_group
+
+def POS(sentence):
+    return nlp.pos_tag(sentence)
+
+def DEP(sentence):
+    return nlp.dependency_parse(sentence)
+
+def tokenize(sentence):
+    return nlp.word_tokenize(sentence)
+
+#def is_input_keyword(token):
+#    return (token in input_relateword_sets)
+
+def is_input_keyword(token):
+    return (lemmatizer.lemmatize(token, pos="v").lower() in input_relateword_sets)
+
+def is_given(token):
+    if token == 'given':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'given')
+
+def is_prep(token):
+    if token == 'of' or token == 'for' or token =='from' or token == 'to':
+        return True
+    else:
+        return False
+
+N_gram = 3
+def word2features(sent, i):
+    current_word = sent[i][0]
+    pos = sent[i][1]
+    ori_sent = ""
+    for k in sent:
+        ori_sent += k[0]
+        ori_sent += " "
+    dep = DEP(ori_sent)
+    
+    features = [
+        'bias',
+        'word=' + current_word,
+        'word.islower={}'.format(current_word.islower()),
+        'word.isupper={}'.format(current_word.isupper()),
+        'word.is_input_keyword={}'.format(is_input_keyword(current_word)),
+        'word.is_prep={}'.format(is_prep(current_word)),
+        'pos=' + pos,
+        #'word.is_given={}'.format(is_given(current_word)),
+        
+    ]
+    #flag = 1
+    #if is_given(current_word):
+    #    token_index = i + 1
+    #    for d in dep:
+    #        if d[1] != token_index and d[2] != token_index:
+    #            continue
+    #        if d[0] == 'amod' and d[2] == token_index:
+    #            amod_relation_word = sent[d[1]-1][0]
+    #           #features.append('word.amod_to_given=' + amod_relation_word)
+    #            features.append('word.amod_dep_to_given=True')
+    #            flag = 0
+    #            dis_to_target = int(d[1])-int(d[2])
+    #            if dis_to_target > 0:
+    #                features.append('+' + str(dis_to_target) + ':amod_target_word=' + amod_relation_word)
+    #                
+    #            break
+    #        #else:
+    #        #    features.append('word.amod_dep_to_given=False')
+    #        #    break
+    #else:
+    #    features.append('word.amod_dep_to_given=False')
+    #if flag:
+    #    features.append('word.amod_dep_to_given=False')
+    #flag = 1
+    for d in dep:
+        if d[0] == 'amod' and d[1]-1 == i:
+            if is_given(sent[d[2]-1][0]):
+                #features.append('word.amod_to_given=' + sent[d[1]-1][0])
+                #features.append('word.amod_to_given=True')
+                features.append('word.should_extration=' + sent[d[1]-1][0])
+                flag = 0
+                
+                dis_to_target = int(d[1])-int(d[2])
+                if dis_to_target > 0:
+                    features.append('-' + str(dis_to_target) + ':amod_to_given=True')
+                
+                break
+    #    elif d[0] == 'amod' and d[2]-1 == i:
+    #        if is_given(sent[d[2]-1][0]):
+    #            #features.append('word.amod_to_given=' + sent[d[1]-1][0])
+    #            features.append('word.amod_to_given=True')
+    #            flag = 0
+    #            break
+    #        #else:
+    #        #    features.append('word.amod_to_given=False')
+    #        #    break                    
+    #if flag:
+    #    features.append('word.amod_to_given=False')
+        
+    
+    if i == 0:
+        features.append('BOS')
+    if i == len(sent) - 1:
+        features.append('EOS')
+        
+    #Forward gram
+    for k in range(N_gram):
+        next_index = k + 1
+        if i + next_index > len(sent) - 1:
+            break
+        target_word = sent[i+next_index][0]
+        target_pos = sent[i+next_index][1]
+        features.extend([
+            '+' + str(next_index) + ':word=' + target_word,
+            '+' + str(next_index) + (':word.islower={}'.format(target_word.islower())),
+            '+' + str(next_index) + (':word.isupper={}'.format(target_word.isupper())),
+            '+' + str(next_index) + ':pos=' + target_pos,
+            '+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
+            '+' + str(next_index) + (':word.is_prep={}'.format(is_prep(target_word))),
+            #'+' + str(next_index) + (':word.is_given={}'.format(is_given(target_word))),
+        ])
+    
+        #if is_input_keyword(target_word):
+        #    token_index = i + next_index + 1
+        #    for d in dep:
+        #        if d[0] == 'amod' and d[2] == token_index:
+        #            amod_relation_word = sent[d[1]-1][0]
+        #            #features.append('+' + str(next_index) + ':word.amod_dep=' + amod_relation_word)
+        #            features.append('+' + str(next_index) + ':word.amod_dep=True')
+        #            break
+    
+    
+    #Backward gram
+    for k in range(N_gram):
+        previous_index = k + 1
+        if i - previous_index < 0:
+            break
+        target_word = sent[i-previous_index][0]
+        target_pos = sent[i-previous_index][1]
+        features.extend([
+            '-' + str(previous_index) + ':word=' + target_word,
+            '-' + str(previous_index) + (':word.islower={}'.format(target_word.islower())),
+            '-' + str(previous_index) + (':word.isupper={}'.format(target_word.isupper())),
+            '-' + str(previous_index) + ':pos=' + target_pos,
+            '-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
+            '-' + str(previous_index) + (':word.is_prep={}'.format(is_prep(target_word))),
+            #'-' + str(previous_index) + (':word.is_given={}'.format(is_given(target_word))),
+        
+        ])
+        
+        #if is_input_keyword(target_word):
+        #    token_index = i-previous_index + 1
+        #    for d in dep:
+        #        if d[0] == 'amod' and d[2] == token_index:
+        #            amod_relation_word = sent[d[1]-1][0]
+        #            #features.append('-' + str(previous_index) + ':word.amod_dep=' + amod_relation_word)
+        #            features.append('-' + str(previous_index) + ':word.amod_dep=True')
+        #            break
+   
+    
+    return features
+
+def sent2features(sent):
+    return [word2features(sent, i) for i in range(len(sent))]
+
+def convert_label_to_CRF_label(X, Y):
+    label_sequence = np.zeros(len(X))
+    i = 0
+    j = 0
+    flag = 0
+    start = -1
+    s_label = -1
+    e_label = -1
+    if len(Y) == 0:
+        return label_sequence
+    while i < len(X):
+        if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
+            flag = 1
+        if X[i] == Y[j]:
+            start = i
+            s_label = j
+            k = j
+            while k < len(Y):
+                if Y[k] == ";" or Y[k] == ".":
+                    break
+                k += 1
+            e_label = k
+            if X[start:start + (e_label - s_label)] == Y[s_label:e_label]:
+                if flag == 1:
+                    label_sequence[start:start + (e_label - s_label)] = 1
+                    #print(start)
+                    #print(start + (e_label - s_label))
+                    flag = 0
+                    i = start + (e_label - s_label)
+                    j = e_label
+                else:
+                    while X[i] != ".":
+                        if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
+                            label_sequence[start:start + (e_label - s_label)] = 1
+                            i = start + (e_label - s_label)
+                            j = e_label
+                            break
+                        i += 1
+            else:
+                i += 1
+        else:
+            i += 1
+        if j >= len(Y):
+            break
+        if Y[j] == ";" or Y[j] == ".":
+            if j == len(Y) - 1:
+                break
+            j += 1
+    return label_sequence
+
+def convert_int_to_str(array):
+    str_seq = [str(x) for x in array]
+    return str_seq
+
+def convert_CRF2Sen(sentence, y):
+    sen = ""
+    for i in range(len(y)):
+        if y[i] == str(1.0):
+            sen += sentence[i] + " "
+    return sen
+
+
+
+raw_sentences = Read_Sentences(TrainDataPath, "sentences_test3")
+label_sentences = Read_Sentences(TrainDataPath, "NN_I_test3")
+train_x = [tokenize(sent) for sent in raw_sentences]
+train_y = [tokenize(sent) for sent in label_sentences]
+
+
+test_sentences = Read_Sentences(TestDataPath, "sentences")
+test_label = Read_Sentences(TestDataPath, "NN_I")
+test_x = [tokenize(sent) for sent in test_sentences]
+test_y = [tokenize(sent) for sent in test_label]
+testing_data = [POS(sent) for sent in test_sentences]
+#testing_data_dep = [DEP(sent) for sent in test_sentences]
+X_test = [sent2features(sent) for sent in testing_data]
+Y_test_integer = []
+for i in range(len(test_x)):
+    Y_test_integer.append(convert_label_to_CRF_label(test_x[i], test_y[i]))
+Y_test = [convert_int_to_str(seq) for seq in Y_test_integer]
+#label_sequence = convert_label_to_CRF_label(train_x[5], train_y[5])
+'''
+Y_train = []
+for i in range(len(train_x)):
+    print(i)
+    Y_train.append(convert_label_to_CRF_label(train_x[i], train_y[i]))
+'''
+
+training_data = [POS(sent) for sent in raw_sentences]
+#training_data_dep = [DEP(sent) for sent in raw_sentences]
+training_label = [tokenize(sent) for sent in label_sentences]
+#print(training_data[0][0][0].isupper())
+X_train = [sent2features(sent) for sent in training_data]
+#Y_train = training_label
+Y_train_integer = []
+for i in range(len(train_x)):
+    Y_train_integer.append(convert_label_to_CRF_label(train_x[i], train_y[i]))
+Y_train = [convert_int_to_str(seq) for seq in Y_train_integer]
+
+#Training
+'''
+model = pycrfsuite.Trainer(verbose=True)
+for xseq, yseq in zip(X_train, Y_train):
+    model.append(xseq, yseq)
+'''
+crf = sklearn_crfsuite.CRF(
+        c1 = 0,
+        c2 = 5e-2,
+        max_iterations = 200,
+        all_possible_transitions = True
+    )
+
+crf.fit(X_train, Y_train)
+
+train_prediction = crf.predict(X_train)
+Train_Correct = 0
+train_fault = []
+train_answer = []
+for i in range(len(X_train)):
+    if train_prediction[i] == Y_train[i]:
+        Train_Correct += 1
+    else:
+        train_fault.append(i)
+        
+for i in range(len(X_train)):
+    train_sen = convert_CRF2Sen(train_x[i], train_prediction[i])
+    train_answer.append(train_sen)
+
+print("Training Accuracy: " + str(Train_Correct/len(X_train)))
+
+
+
+prediction = crf.predict(X_test)
+Correct = 0
+fault = []
+answer = []
+for i in range(108):
+    if prediction[i] == Y_test[i]:
+        Correct += 1
+    else:
+        fault.append(i)
+        
+for i in range(108):
+    sen = convert_CRF2Sen(test_x[i], prediction[i])
+    answer.append(sen)
+
+target_index = [10,18,20]
+Amod_error = [crf.predict_marginals_single(X_test[index]) for index in target_index]
+
+print("Testing Accuracy: " + str(Correct/108))
+'''
+model.set_params({
+        'c1': 1.0,
+        'c2': 1e-3,
+        'max_iterations': 200,
+        'feature.possible_transitions': True,
+        'feature.minfreq': 3
+    })
+model.train(model)
+#Testing
+tagger = pycrfsuite.Tagger()
+tagger.open(model)
+'''
+#y_pred = crf.predict(X_train)
+#print(y_pred[0])
+
+
+nlp.close()
