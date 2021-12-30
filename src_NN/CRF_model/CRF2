@@ -132,6 +132,14 @@ def is_from(token):
 def is_to(token):
     return token == 'to'
 
+def find_difference(anchor, target):
+    difference = []
+    for error in anchor:
+        if not(error in target):
+            difference.append(error)
+    return difference
+        
+
 N_gram = 3
 def word2features(sent, i):
     current_word = sent[i][0]
@@ -349,9 +357,39 @@ def fault_type(fault, prediction):
             fault_error.append(1)
     return fault_error
 
-
+t_fault_error = fault_type(train_fault, train_answer)
 fault_error = fault_type(fault, answer)
 
+state_features = crf.state_features_
+crffeatures = []
+for key, index in state_features.items():
+    crffeatures.append(key)
+    
+def feature_weight_extraction(X, Y, state_features, features):
+    weights = []
+    for word_index in range(len(X)):
+        word_weight = []
+        for feature in X[word_index]:
+            target_pair = (feature,Y[word_index])
+            if target_pair in features:
+                word_weight.append([target_pair,state_features[target_pair]])
+            else:
+                word_weight.append([target_pair,None])
+        weights.append(word_weight)
+    return weights
+
+train_feature_weights = []
+test_feature_weights = []
+prediction_train_feature_weights = []
+prediction_test_feature_weights = []
+
+for index in range(len(X_train)):
+    train_feature_weights.append(feature_weight_extraction(X_train[index], Y_train[index], state_features, crffeatures))
+    prediction_train_feature_weights.append(feature_weight_extraction(X_train[index], train_prediction[index], state_features, crffeatures))
+
+for index in range(len(X_test)):
+    test_feature_weights.append(feature_weight_extraction(X_test[index], Y_test[index], state_features, crffeatures))
+    prediction_test_feature_weights.append(feature_weight_extraction(X_test[index], prediction[index], state_features, crffeatures))
 
 
 amod_target_index = [10,18,20,30,41,47,55] # [10,18,30,47,55]
@@ -469,7 +507,7 @@ def classify_error(fault, mode):
         flag = 0
         for error in fault:
             for index in range(len(training_classification_result)):
-                if error in training_classification_result[index]:
+                if (error + 1) in training_classification_result[index]:
                     flag = 1
                     classification_result.append(index)
                     break
@@ -481,7 +519,7 @@ def classify_error(fault, mode):
         flag = 0
         for error in fault:
             for index in range(len(testing_classification_result)):
-                if error in testing_classification_result[index]:
+                if (error+1) in testing_classification_result[index]:
                     flag = 1
                     classification_result.append(index)
                     break
@@ -493,7 +531,7 @@ def classify_error(fault, mode):
     return classification_result
 
 cr = classify_error(fault, 1)
-
+t_cr = classify_error(train_fault, 0)
 
 classfication_index_pair = {
     0:"receive_obj_NN",
@@ -532,7 +570,34 @@ def drawPie(classification_result, mode = 0):
     plt.pie(value, labels = target, autopct="%1.1f%%")
     plt.axis('equal')
     plt.show()
-    
 
+
+
+def drawBar(classification_result, mode = 0):
+    cal_total_occurence = Counter(classification_result)
+    target = []
+    value = []
+    for key, val in cal_total_occurence.items():
+        if mode == 0:
+            target.append(key)
+        else:
+            target.append(empty_index_pair[key])
+        value.append(val)
+    x = np.arange(len(target))
+    plt.bar(x, value)
+    plt.xticks(x, target)
+    plt.xlabel('Error type')
+    plt.ylabel('Number of errors')
+    #plt.title('Final Term')
+    plt.show()
+
+drawPie(t_cr,0)
+drawPie(t_fault_error,1)
+drawPie(cr,0)
+drawPie(fault_error,1)
+drawBar(t_cr,0)
+drawBar(t_fault_error,1)
+drawBar(cr,0)
+drawBar(fault_error,1)
 
 nlp.close()
