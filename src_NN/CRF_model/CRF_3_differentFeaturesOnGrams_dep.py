@@ -140,6 +140,9 @@ def is_from(token):
 def is_to(token):
     return token == 'to'
 
+def is_cc(pos):
+    return pos == 'CC'
+
 def find_difference(anchor, target):
     difference = []
     for error in anchor:
@@ -147,146 +150,75 @@ def find_difference(anchor, target):
             difference.append(error)
     return difference
 
+def is_uniqueWord(word):
+    word_len = len(word)
+    for i in range(word_len):
+        if i != 0 and word[i].isupper():
+            return 1
+    return 0
+
 N_gram = 3
 def word2features(sent, i, dep):
-    current_word = sent[i][0]
-    pos = sent[i][1]
-    
-    features = [
-        'bias',
-        #'word=' + current_word,
-        'word.islower={}'.format(current_word.islower()),
-        'word.isupper={}'.format(current_word.isupper()),
-        #'word.is_input_keyword={}'.format(is_input_keyword(current_word)),
-        #'word.is_input_keyword={}'.format(is_input_keyword_woGiven(current_word)),
-        'word.is_prep={}'.format(is_prep(current_word)),
-        'pos=' + pos,
-        #'word.is_given={}'.format(is_given(current_word)),
-        
-    ]
-    
-    if current_word.lower() != "given":
-        features.append('word.is_input_keyword={}'.format(is_input_keyword(current_word)))
-    
-    #flag = 1
-    #if is_given(current_word):
-    #    token_index = i + 1
-    #    for d in dep:
-    #        if d[1] != token_index and d[2] != token_index:
-    #            continue
-    #        if d[0] == 'amod' and d[2] == token_index:
-    #            amod_relation_word = sent[d[1]-1][0]
-    #           #features.append('word.amod_to_given=' + amod_relation_word)
-    #            features.append('word.amod_dep_to_given=True')
-    #            flag = 0
-    #            dis_to_target = int(d[1])-int(d[2])
-    #            if dis_to_target > 0:
-    #                features.append('+' + str(dis_to_target) + ':amod_target_word=' + amod_relation_word)
-    #                
-    #            break
-    #        #else:
-    #        #    features.append('word.amod_dep_to_given=False')
-    #        #    break
-    #else:
-    #    features.append('word.amod_dep_to_given=False')
-    #if flag:
-    #    features.append('word.amod_dep_to_given=False')
-    #flag = 1
-    for d in dep:
-        if d[0] == 'amod' and d[1]-1 == i:
-            if is_given(sent[d[2]-1][0]):
-                #features.append('word.amod_to_given=' + sent[d[1]-1][0])
-                #features.append('word.amod_to_given=True')
-                features.append('word.should_extration=' + sent[d[1]-1][0])
-                #features.append(':amod_to_given=True')
-                #flag = 0
-                
-                #dis_to_target = int(d[1])-int(d[2])
-                #if dis_to_target > 0:
-                #    features.append('-' + str(dis_to_target) + ':amod_to_given=True')
-                
-                break
-    #    elif d[0] == 'amod' and d[2]-1 == i:
-    #        if is_given(sent[d[2]-1][0]):
-    #            #features.append('word.amod_to_given=' + sent[d[1]-1][0])
-    #            features.append('word.amod_to_given=True')
-    #            flag = 0
-    #            break
-    #        #else:
-    #        #    features.append('word.amod_to_given=False')
-    #        #    break                    
-    #if flag:
-    #    features.append('word.amod_to_given=False')
-        
-    
+    features = []
+    #Begin and end of sequence
     if i == 0:
         features.append('BOS')
     if i == len(sent) - 1:
         features.append('EOS')
-        
-    #Forward gram
-    for k in range(N_gram):
-        next_index = k + 1
-        if i + next_index > len(sent) - 1:
-            break
-        target_word = sent[i+next_index][0]
-        target_pos = sent[i+next_index][1]
-        
-        if target_word.lower() != "given":
-            features.append('+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))))
-        
-        features.extend([
-            #'+' + str(next_index) + ':word=' + target_word,
-            '+' + str(next_index) + (':word.islower={}'.format(target_word.islower())),
-            '+' + str(next_index) + (':word.isupper={}'.format(target_word.isupper())),
-            '+' + str(next_index) + ':pos=' + target_pos,
-            #'+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
-            #'+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword_woGiven(target_word))),
-            '+' + str(next_index) + (':word.is_prep={}'.format(is_prep(target_word))),
-            #'+' + str(next_index) + (':word.is_given={}'.format(is_given(target_word))),
-        ])
     
-        #if is_input_keyword(target_word):
-        #    token_index = i + next_index + 1
-        #    for d in dep:
-        #        if d[0] == 'amod' and d[2] == token_index:
-        #            amod_relation_word = sent[d[1]-1][0]
-        #            #features.append('+' + str(next_index) + ':word.amod_dep=' + amod_relation_word)
-        #            features.append('+' + str(next_index) + ':word.amod_dep=True')
-        #            break
+    #Add bias
+    features.append('bias')
     
+    #Add pos
+    features.append('pos=' + sent[i][1])
     
-    #Backward gram
-    for k in range(N_gram):
-        previous_index = k + 1
-        if i - previous_index < 0:
-            break
-        target_word = sent[i-previous_index][0]
-        target_pos = sent[i-previous_index][1]
+    #Dependency features
+    num_root = 0
+    last_period = 0
+    for d in dep:
+        if d[0] == 'ROOT':
+            num_root +=1
+        while num_root > 1:
+            if last_period == len(sent):
+                print(sent)
+            if sent[last_period][1] == '.':
+                num_root -= 1
+            last_period += 1
+
+        if last_period + d[1]-1 == i:
+            if d[2] > d[1]:
+                t_position = i + (d[2] - d[1])
+                features.append('+' + str(d[2]-d[1]) + (':' + d[0]))
+                features.append('+' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                if is_given(sent[t_position][0]):
+                    features.append('+' + str(d[2]-d[1]) + (':is_given = True'))
+            else:
+                t_position = i - (d[1] - d[2])
+                features.append('-' + str(d[1]-d[2]) + (':' + d[0]))
+                features.append('-' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                if is_given(sent[t_position][0]):
+                    features.append('-' + str(d[1]-d[2]) + (':is_given = True'))
+                
+        elif last_period + d[2]-1 == i:
+            if d[2] > d[1]:
+                features.append('-' + str(d[2]-d[1]) + (':' + d[0]))
+            else:
+                features.append('+' + str(d[1]-d[2]) + (':' + d[0]))
+                
+    
         
-        if target_word.lower() != "given":
-            features.append('-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))))
-        
-        features.extend([
-            #'-' + str(previous_index) + ':word=' + target_word,
-            '-' + str(previous_index) + (':word.islower={}'.format(target_word.islower())),
-            '-' + str(previous_index) + (':word.isupper={}'.format(target_word.isupper())),
-            '-' + str(previous_index) + ':pos=' + target_pos,
-            #'-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
-            #'-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword_woGiven(target_word))),
-            '-' + str(previous_index) + (':word.is_prep={}'.format(is_prep(target_word))),
-            #'-' + str(previous_index) + (':word.is_given={}'.format(is_given(target_word))),
-        
-        ])
-        
-        #if is_input_keyword(target_word):
-        #    token_index = i-previous_index + 1
-        #    for d in dep:
-        #        if d[0] == 'amod' and d[2] == token_index:
-        #            amod_relation_word = sent[d[1]-1][0]
-        #            #features.append('-' + str(previous_index) + ':word.amod_dep=' + amod_relation_word)
-        #            features.append('-' + str(previous_index) + ':word.amod_dep=True')
-        #            break
+    
+    #features = [
+        #'bias',
+        #'word=' + current_word,
+        #'word.islower={}'.format(current_word.islower()),
+        #'word.isupper={}'.format(current_word.isupper()),
+        #'word.is_input_keyword={}'.format(is_input_keyword(current_word)),
+        #'word.is_input_keyword={}'.format(is_input_keyword_woGiven(current_word)),
+        #'word.is_prep={}'.format(is_prep(current_word)),
+        #'pos=' + pos,
+        #'word.is_given={}'.format(is_given(current_word)),
+    #]
    
     
     return features
@@ -486,6 +418,27 @@ def fault_type(fault, prediction):
         else:
             fault_error.append(1)
     return fault_error
+
+def word_error(fault, prediction, answer):
+    word_err = []
+    for error in fault:
+        seq = answer[error]
+        p_seq = prediction[error]
+        total_word = len(seq)
+        error_word = 0
+        error_10 = 0
+        error_01 = 0
+        for index in range(len(seq)):
+            if seq[index] == '1.0' and p_seq[index] == '0.0':
+                error_word += 1
+                error_10 += 1
+            elif seq[index] == '0.0' and p_seq[index] == '1.0':
+                error_word += 1
+                error_01 += 1
+        word_err.append([error, error_01, error_10, error_word, total_word, error_word/total_word])
+    return word_err
+                
+
 
 t_fault_error = fault_type(train_fault, train_answer)
 fault_error = fault_type(fault, answer)

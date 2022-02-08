@@ -461,19 +461,51 @@ def feature_weight_extraction(X, Y, state_features, features):
         weights.append(word_weight)
     return weights
 
+def possible_feature_weight_extraction(X, state_features, features):
+    weights_0 = []
+    weights_1 = []
+    for word_index in range(len(X)):
+        word_weight_0 = []
+        word_weight_1 = []
+        for feature in X[word_index]:
+            target_pair_0 = (feature,'0.0')
+            target_pair_1 = (feature,'1.0')
+            if target_pair_0 in features:
+                word_weight_0.append([target_pair_0,state_features[target_pair_0]])
+            else:
+                word_weight_0.append([target_pair_0,None])
+            if target_pair_1 in features:
+                word_weight_1.append([target_pair_1,state_features[target_pair_1]])
+            else:
+                word_weight_1.append([target_pair_1,None])
+        weights_0.append(word_weight_0)
+        weights_1.append(word_weight_1)
+    return weights_0, weights_1
+
 train_feature_weights = []
 test_feature_weights = []
 prediction_train_feature_weights = []
 prediction_test_feature_weights = []
 
+weights_0 = []
+weights_1 = []
+
+train_weights_0 = []
+train_weights_1 = []
+
 for index in range(len(X_train)):
     train_feature_weights.append(feature_weight_extraction(X_train[index], Y_train[index], state_features, crffeatures))
     prediction_train_feature_weights.append(feature_weight_extraction(X_train[index], train_prediction[index], state_features, crffeatures))
-
+    temp_0, temp_1 = possible_feature_weight_extraction(X_train[index], state_features, crffeatures)
+    train_weights_0.append(temp_0)
+    train_weights_1.append(temp_1)
+    
 for index in range(len(X_test)):
     test_feature_weights.append(feature_weight_extraction(X_test[index], Y_test[index], state_features, crffeatures))
     prediction_test_feature_weights.append(feature_weight_extraction(X_test[index], prediction[index], state_features, crffeatures))
-
+    temp_0, temp_1 = possible_feature_weight_extraction(X_test[index], state_features, crffeatures)
+    weights_0.append(temp_0)
+    weights_1.append(temp_1)
 
 
 #Training Data Index (need to -1 for 0-index)
@@ -644,6 +676,15 @@ drawBar(t_fault_error,1)
 drawBar(cr,0)
 drawBar(fault_error,1)
 
+def find_meaning_weights(sen_feature, target_index, threshold = 0.5):
+    meaning_weights = []
+    target_sen = sen_feature[target_index]
+    for item in target_sen:
+        if item[1] == None:
+            meaning_weights.append(item)
+        elif abs(float(item[1])) >= threshold:
+            meaning_weights.append(item)
+    return meaning_weights
 
 #y_pred = crf.predict(X_train)
 #print(y_pred[0])
