@@ -1,0 +1,34 @@
+3 - obtain the cheapest price which offered, obtain跟offered有dep, 可加入which解決
+7 - findRestaurant特殊名詞導致dep, 把特殊名詞改成Service#可以解決
+8 - guideRestaurant特殊名詞導致dep, 把特殊名詞改成Service#可以解決
+9 - start and destination addresses, start有dep連到addresses, 可以改為start address and destination address
+13 - Return應為VB但被辨識為NN, if and only if句型有dep出現, 前者return true的true改為"true"可以改善,後者if and only if可能並非正規英文,只用於科學領域
+17 - 1.dep為given及write兩動詞連接中間有,相隔,後面句子缺少主詞, 可直接斷句解決 2.output -> NN可能為dep原因, 將其改為return可以解決問題，但會影響後方句子結構導致多出dep
+19 - output -> NN使dep產生, 可換成return解決
+23 - 因句子有特殊符號[i]使得產生dep, 將其去掉可以解決,但會改變語意
+25 - that以及後面VBN被動語態有dep,去掉that可以解決
+26 - 1.given ..., return 有dep 可能為後方缺少主詞, 做斷句可以解決 但會使得前面Now, given的,及given之間多dep 2.return與[L,R]有dep, 可能為特殊符號導致, 斷句過後可以直接解決
+27 - 1.construct ... by 有dep, construct須改被動式 2.array and output the root node, array及node有dep, 為output -> NN 的影響, 將output換為return可以解決
+28 - time that Ashe is in poisoned condition, time及condition有dep, 前方有output -> NN的問題, that也是造成dep原因
+30 - given ..., return 有dep 可能為後方缺少主詞, 做斷句可以解決
+31 - concatenation連接dep到特殊符號[]中的字以及特殊符號+,因此可能為特殊符號造成
+32 - return與＃value有dep,=與＃value有dep,後面only '+','-'operation, only及operation也有dep,皆可能為特殊符號造成
+35 - nums與特殊符號[]中的字有dep
+37 - such與後面gets(VBN)有dep連結，不確定原因為何, 少了such that就不會有dep
+38 - =與1有dep,可能為特殊符號問題
+40 - list跟tells(VBN)有dep, tells(VBN)跟wait(VB)也有dep,不確定原因為何 把原句such拿掉並在tell後面加上about可以修正問題
+42 - 此句有許多特殊符號,dep皆跟這些特殊符號有關
+44 - Now given all the cities and flights, all跟cities有dep, 可能原因為中間的the, 刪掉the可以解決問題
+45 - 1.string arrays queries, arrays及queries有dep,可能為arrays問題, 複合名詞於最尾端加入複數形就可以 2.such that f &lt; f, such與f有dep,為特殊符號造成
+46 - P i and a minimum capital of C i is needed, P及needed有dep, 可能為P i以及句子結構問題(Ci後接that)
+47 - To sum up , pick ..., sum及pick有dep, 可能為pick句子缺少主詞, 後面有output -> NN
+48 - 1.If the ' reshape ' operation, reshape及operation有dep, 可能為特殊符號'造成 2.output -> NN造成dep無法定位target
+50 - output -> NN, given與make(VB)有dep,可能為句型結構問題
+51 - 1.,跟given有dep, 可能為缺少主詞 2. string s we need, string跟need(VBP)有dep, 可能為缺少連接主從句詞彙, 加入that可以解決
+52 - 前面有output -> NN such that there are no ...,such跟are有dep, 可能是錯誤使用such
+53 - the matchsticks the little match girl has, matchsticks跟has(VBZ)有dep, 可能為句型問題(少that)
+56 - axis - aligned, axis及aligned有dep, 可能為文法問題, 名詞位置錯誤
+60 - output -> NN 導致前面的單字出現dep
+61 - return true為dep連接, return -> NN, true -> JJ, 可能為pos錯誤導致
+64 - u &lt; v, u v間dep連接, 特殊符號問題
+65 - Write a function strongPasswordChecker , that takes, write跟takes有dep, 可能為句型問題(that前逗號)

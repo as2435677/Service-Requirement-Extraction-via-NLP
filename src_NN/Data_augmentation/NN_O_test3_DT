@@ -1,0 +1,66 @@
+the Name of a theatre for that city and the receipt for the booking performance
+a payment from the credit card for the purchase , as well as shipping dates and customs costs for the specific item
+HotelConfirmation and RentalConfirmation
+the cheapest price offered by a shop close to his position, the GPS coordinate of this shop and a review of the product
+the blood pressure (BP) of a patient given his PatientID (PID) and DeviceAddress; respectively the supervisor (Person) and a physician of an organisation (Org); a Warning level (WL) given a blood pressure; the Emergency department given a level of Warning; the Organization given a Warning level
+the patient’s description. the patient’s current treatment. the patient’s previous treatments. the medication involved in this treatment. the drug class of this medication
+the address and zip code of the hotel
+the name, phone number, and address of the restaurant with matching food preference and closest to the zip code
+the address of the closest restaurant and its rating
+a detailed step-by-step driving direction and a map image of the destination address
+the k-th ancestor of the given node. -1
+the length of the longest absolute path to a file in the abstracted file system . 0
+the largest multiple of three that can be formed by concatenating some of the given digits in any order
+true
+the minimum number of swaps to make both sequences strictly increasing
+the number of different non-empty substrings of p in the string s
+the number of' 1's in the first N number in the magical string S
+the skyline formed by these buildings collectively
+the number of important reverse pairs in the given array
+" foobar " n times
+the total importance value of this employee and all their subordinates
+the integer value of
+the number of unique pairs
+a new counts array
+the count of each atom
+the maximum number of unique substrings that the given string can be split into
+the number of superpalindromes in the inclusive range [ L , R ]
+the root node of this tree
+the total time that Ashe is in poisoned condition
+the final grid
+the number of segments in the string
+all the pairs of the distinct indices ( i , j ) in the given list
+the value of x in the form of string " x = #value " 
+the k th lexicographically smallest instructions that will take Bob to destination
+the length of the longest uncommon subsequence . -1
+its index
+the ordering of courses you should take to finish all courses
+the integer value
+the copy of the given node as a reference to the cloned graph
+a list of integers representing the size of these parts
+a list . 0
+the subtree rooted with that node . NULL
+a list of tokens representing the simplified expression
+the rotation index K that corresponds to the highest score . the smallest such index K
+the cheapest price from src to dst with up to k stops . -1
+an integer array answer
+its pure profit and the profit will be added to your total capital
+your final maximized capital
+the new reshaped matrix ; the original matrix
+the minimum number of steps to walk from the upper left corner ( 0 , 0 ) to the lower right corner ( m-1 , n-1 ) given that you can eliminate at most k obstacles . -1
+the lowest price you have to pay for exactly certain items as given
+the sum of countUniqueChars ( t ) where t is a substring of s
+the maximum profit you can take
+true or false
+the sum as a linked list
+the complement of it's binary representation as a base-10 integer
+the order of the plus sign . 0
+the smallest good base of n in string format
+the maximum average value
+the index of a given target number
+an integer . the series 010203040506
+true
+the board after revealing this position according to the following rules
+the sorted list of words that the expression represents
+an edge that can be removed so that the resulting graph is a tree of N nodes . the answer that occurs last in the given 2D-array
+the MINIMUM change required to makes a strong password . 0

@@ -480,15 +480,15 @@ def convert_label_to_CRF_label(X, Y):
         if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
             flag = 1
         if X[i] == Y[j]:
-            #if i != 0 and X[i] == 'color' and X[i-1] == ',':
-            #    i+=1
-            #    continue
-            #if i != 0 and X[i] == 'value' and X[i-1] == "'s":
-            #    i+=1
-            #    continue
-            #if i != 0 and X[i] == 'projects' and X[i-1] == "distinct":
-            #    i+=1
-            #    continue
+            if i != 0 and X[i] == 'color' and X[i-1] == ',':
+                i+=1
+                continue
+            if i != 0 and X[i] == 'value' and X[i-1] == "'s":
+                i+=1
+                continue
+            if i != 0 and X[i] == 'projects' and X[i-1] == "distinct":
+                i+=1
+                continue
             start = i
             s_label = j
             k = j
@@ -507,9 +507,6 @@ def convert_label_to_CRF_label(X, Y):
                     j = e_label
                 else:
                     while X[i] != ".":
-                        if i < len(X) - 1 and lemmatizer.lemmatize(X[i], pos="v").lower() != 'be' and lemmatizer.lemmatize(X[i+1], pos="v").lower() in input_relateword_sets:
-                            i+=1
-                            break
                         if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
                             label_sequence[start:start + (e_label - s_label)] = 1
                             i = start + (e_label - s_label)

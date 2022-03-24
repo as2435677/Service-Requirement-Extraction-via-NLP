@@ -17,7 +17,7 @@ a list of three points in the plane
 the integer array cardPoints and the integer k
 the fork on their right or the one on their left as they become available
 timestamp
-the integer n representing the number of courses at some university labeled from 1 to n , and the array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship ; the integer k
+the integer n representing the number of courses at some university labeled from 1 to n , and the array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship, integer k
 num
 sequence of books
 a list of queries , and a pattern
@@ -38,12 +38,12 @@ an array of variable pairs equations and an array of real numbers values
 a list of words
 
 a positive integer num
-array ; array
+array
 rules
 a non-negative integer n which represents the number of LEDs that are currently on
 a matrix of M x N elements
 the integer n and the array roads
-a set of pairs ; pairs
+a set of pairs
 
 node
 
@@ -56,13 +56,13 @@ a lower and upper number bound
 bucket
 
 a 2D char matrix representing the game board
-string S ; an array widths
+string S, an array widths
 the head of a linked list
 a VPS represented as string s
 an integer array A , and an integer target
 a root node
 array
-an array of distinct positive integers locations where locations [ i ] represents the position of city i ; integers start , finish and fuel representing the starting city , ending city , and the initial amount of fuel you have
+an array of distinct positive integers locations where locations [ i ] represents the position of city i, integers start , finish and fuel representing the starting city , ending city , and the initial amount of fuel you have
 heights , a 2D array of size rows x columns
 
 the following tree
@@ -83,7 +83,7 @@ an array of distinct integers arr and an array of integer arrays pieces
 the array nums
 
 
-a tree ( ie a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges ; string labels
+a tree ( ie a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges, string labels
 two arrays of integers with equal lengths
 a N * N matrix M representing the friend relationship between students in the class
 an integer n
@@ -95,7 +95,7 @@ an m x n 2d grid map of' 1' s ( land ) and' 0' s
 
 
 the starting string start and the ending string end
-a root node reference of a BST and a key ; key
+a root node reference of a BST and a key
 A mapping of digit to letters
 
 an array of network towers towers and an integer radius

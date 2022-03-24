@@ -38,6 +38,13 @@ input_relateword_sets = [
     "take"
     ]
 
+output_relateword_sets = [
+    "output",
+    "return",
+    "obtain",
+    "find"
+    ]
+
 Service_NameGroup = {}
 Service_number = 0
 
@@ -80,6 +87,11 @@ def replace_unique_word(raw_sentence):
         if skip_nums != 0:
             temp = Equation_NameGroup[equ]
             if skip_nums == 1:
+                #Replacing existing Equation#
+                for index, equation in Equation_NameGroup.items():
+                    if equation == temp:
+                        sen[-1] = index
+                        break
                 sen.append('"')
                 #print(raw_sentence)
             else:
@@ -250,6 +262,11 @@ def is_input_keyword(token):
 def is_input_keyword_woGiven(token):
     return (lemmatizer.lemmatize(token, pos="v").lower() in input_relateword_sets) and token.lower() != "given"
 
+def is_return(token):
+    if token == 'return':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'return')
+
 def is_given(token):
     if token == 'given':
         return True
@@ -342,7 +359,7 @@ def is_uniqueWord(word):
             return 1
     return 0
 
-N_gram = 1
+N_gram = 3
 def word2features(sent, i, dep):
     features = []
     #Begin and end of sequence
@@ -381,14 +398,18 @@ def word2features(sent, i, dep):
                 t_position = i + (d[2] - d[1])
                 features.append('+' + str(d[2]-d[1]) + (':Dep=' + d[0]))
                 features.append('+' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
-                if is_input_keyword(sent[t_position][0]):
-                    features.append('+' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                if is_given(sent[t_position][0]):
+                    features.append('+' + str(d[2]-d[1]) + (':is_given = True'))
+                if is_return(sent[t_position][0]):
+                    features.append('+' + str(d[2]-d[1]) + (':is_return = True'))
             else:
                 t_position = i - (d[1] - d[2])
                 features.append('-' + str(d[1]-d[2]) + (':Dep=' + d[0]))
                 features.append('-' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
-                if is_input_keyword(sent[t_position][0]):
-                    features.append('-' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                if is_given(sent[t_position][0]):
+                    features.append('-' + str(d[1]-d[2]) + (':is_given = True'))
+                if is_return(sent[t_position][0]):
+                    features.append('-' + str(d[1]-d[2]) + (':is_return = True'))
                 
         elif last_period + d[2]-1 == i:
             #v2 constrain in
@@ -401,52 +422,12 @@ def word2features(sent, i, dep):
                 t_position = i - (d[2] - d[1])
                 features.append('-' + str(d[2]-d[1]) + (':Dep=' + d[0]))
                 features.append('-' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
-                if is_input_keyword(sent[t_position][0]):
-                    features.append('-' + str(d[2]-d[1]) + (':is_input_keyword = True'))
             else:
                 t_position = i + (d[1] - d[2])
                 features.append('+' + str(d[1]-d[2]) + (':Dep=' + d[0]))
                 features.append('+' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
-                if is_input_keyword(sent[t_position][0]):
-                    features.append('+' + str(d[1]-d[2]) + (':is_input_keyword = True'))
     
-    #Forward gram
-    for k in range(N_gram):
-        next_index = k + 1
-        if i + next_index > len(sent) - 1:
-            break
-        target_word = sent[i+next_index][0]
-        target_pos = sent[i+next_index][1]
-        f_next_pos = '+' + str(next_index) + (':pos=' + target_pos)
-        if f_next_pos not in features:
-            features.append(f_next_pos)
-        #features.extend([
-            #'+' + str(next_index) + ':word=' + target_word,
-            #'+' + str(next_index) + (':word.islower={}'.format(target_word.islower())),
-            #'+' + str(next_index) + (':word.isupper={}'.format(target_word.isupper())),
-            #'+' + str(next_index) + ':pos=' + target_pos,
-            #'+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
-            #'+' + str(next_index) + (':word.is_prep={}'.format(is_prep(target_word))),
-        #])
-
-    #Backward gram
-    for k in range(N_gram):
-        previous_index = k + 1
-        if i - previous_index < 0:
-            break
-        target_word = sent[i-previous_index][0]
-        target_pos = sent[i-previous_index][1]
-        f_prev_pos = '-' + str(previous_index) + (':pos=' + target_pos)
-        if f_prev_pos not in features:
-            features.append(f_prev_pos)
-        #features.extend([
-            #'-' + str(previous_index) + ':word=' + target_word,
-            #'-' + str(previous_index) + (':word.islower={}'.format(target_word.islower())),
-            #'-' + str(previous_index) + (':word.isupper={}'.format(target_word.isupper())),
-            #'-' + str(previous_index) + ':pos=' + target_pos,
-            #'-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
-            #'-' + str(previous_index) + (':word.is_prep={}'.format(is_prep(target_word))),
-        #])
+        
     
     #features = [
         #'bias',
@@ -480,15 +461,6 @@ def convert_label_to_CRF_label(X, Y):
         if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
             flag = 1
         if X[i] == Y[j]:
-            #if i != 0 and X[i] == 'color' and X[i-1] == ',':
-            #    i+=1
-            #    continue
-            #if i != 0 and X[i] == 'value' and X[i-1] == "'s":
-            #    i+=1
-            #    continue
-            #if i != 0 and X[i] == 'projects' and X[i-1] == "distinct":
-            #    i+=1
-            #    continue
             start = i
             s_label = j
             k = j
@@ -507,9 +479,6 @@ def convert_label_to_CRF_label(X, Y):
                     j = e_label
                 else:
                     while X[i] != ".":
-                        if i < len(X) - 1 and lemmatizer.lemmatize(X[i], pos="v").lower() != 'be' and lemmatizer.lemmatize(X[i+1], pos="v").lower() in input_relateword_sets:
-                            i+=1
-                            break
                         if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
                             label_sequence[start:start + (e_label - s_label)] = 1
                             i = start + (e_label - s_label)
@@ -528,20 +497,71 @@ def convert_label_to_CRF_label(X, Y):
             j += 1
     return label_sequence
 
+
+def convert_output_label_to_CRF_label(X, Y):
+    label_sequence = np.zeros(len(X))
+    i = 0
+    j = 0
+    flag = 0
+    start = -1
+    s_label = -1
+    e_label = -1
+    if len(Y) == 0:
+        return label_sequence
+    while i < len(X):
+        if lemmatizer.lemmatize(X[i], pos="v").lower() in output_relateword_sets:
+            flag = 1
+        if X[i] == Y[j]:
+            if i > 0 and X[i-1] == 'Given':
+                i += 1
+                continue
+            start = i
+            s_label = j
+            k = j
+            while k < len(Y):
+                if Y[k] == ";" or Y[k] == ".":
+                    break
+                k += 1
+            e_label = k
+            if X[start:start + (e_label - s_label)] == Y[s_label:e_label]:
+                if flag == 1:
+                    label_sequence[start:start + (e_label - s_label)] = 1
+                    #print(start)
+                    #print(start + (e_label - s_label))
+                    flag = 0
+                    i = start + (e_label - s_label)
+                    j = e_label
+                else:
+                    while X[i] != ".":
+                        if lemmatizer.lemmatize(X[i], pos="v").lower() in output_relateword_sets:
+                            label_sequence[start:start + (e_label - s_label)] = 1
+                            i = start + (e_label - s_label)
+                            j = e_label
+                            break
+                        i += 1
+            else:
+                i += 1
+        else:
+            i += 1
+
+        if j >= len(Y):
+            break
+        if Y[j] == ";" or Y[j] == ".":
+            if j == len(Y) - 1:
+                break
+            j += 1
+    return label_sequence
+
 def convert_int_to_str(array):
     str_seq = [str(x) for x in array]
     return str_seq
 
 def convert_CRF2Sen(sentence, y):
-    sen_group = []
     sen = ""
     for i in range(len(y)):
         if y[i] == str(1.0):
             sen += sentence[i] + " "
-        if i != len(y) - 1 and y[i] == str(1.0) and y[i+1] == str(0.0):
-            sen_group.append(sen)
-            sen = ""
-    return sen_group
+    return sen
 
 def find_sen_index(sent, dataset):
     for index in range(len(dataset)):
@@ -584,6 +604,23 @@ Y_train_integer = []
 for i in range(len(train_x)):
     Y_train_integer.append(convert_label_to_CRF_label(train_x[i], train_y[i]))
 Y_train = [convert_int_to_str(seq) for seq in Y_train_integer]
+
+output_label_sentences = Read_Sentences(TrainDataPath, "NN_O_test3_DT")
+output_train_y = [tokenize(sent) for sent in output_label_sentences]
+Y_train_integer_output = []
+for i in range(len(train_x)):
+    Y_train_integer_output.append(convert_output_label_to_CRF_label(train_x[i], output_train_y[i]))
+Y_train_output = [convert_int_to_str(seq) for seq in Y_train_integer_output]
+
+def combineIO(Y, Y_O):
+    for i in range(len(Y)):
+        if Y_O[i] == '1.0':
+            Y[i] = Y_O[i]
+    return Y
+
+for i in range(len(train_x)):
+    Y_train[i] = combineIO(Y_train[i], Y_train_output[i])
+
 
 #Training
 '''
