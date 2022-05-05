@@ -1,0 +1,1065 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun  7 15:40:07 2021
+
+@author: ken
+"""
+
+from stanfordcorenlp import StanfordCoreNLP
+import numpy as np
+import pandas as pd
+import re
+from nltk.corpus import stopwords
+import warnings
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+import pycrfsuite
+import sklearn_crfsuite
+from nltk.stem import WordNetLemmatizer
+import sys
+from collections import Counter
+from pattern.en import conjugate, PAST
+
+TrainDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/Data_augmentation/"
+TestDataPath = "/home/ken/Service-Requirement-Extraction-via-NLP/src/Leetcode_data/ExtraData/"
+PreTrain_WV_Path = "/home/ken/Service-Requirement-Extraction-via-NLP/src_NN/GloVe/"
+
+nlp = StanfordCoreNLP(r'/home/ken/stanford-corenlp-4.2.0')
+lemmatizer = WordNetLemmatizer()
+
+
+input_relateword_sets = [
+    "input",
+    "given",
+    "give",
+    "provide",
+    "receive",
+    "take"
+    ]
+
+Service_NameGroup = {}
+Service_number = 0
+
+Equation_NameGroup = {}
+Equation_number = 0
+
+Mapping = {
+    '&lt;': '<',
+    '=': 'equal to',
+    #'≠': 'not equal to',
+    #'{': '"',
+    #'}': '"'
+    
+    }
+
+def SentencesProcessing(raw_sentences):
+    #new_sentences = raw_sentences.lower()
+    new_sentences = re.sub(r'\([^)]*\)', '', raw_sentences)
+    new_sentences = re.sub(r"\n","", new_sentences)
+    #new_sentences = re.sub('"','', new_sentences)
+    #tokens = [w for w in new_sentences.split() if not w in stop_words]
+    #new_sentences = re.sub("[^a-zA-Z]", " ", new_sentences) 
+    long_words=[]
+    for i in new_sentences.split():
+        long_words.append(i)   
+    return (" ".join(long_words)).strip()
+
+def replace_unique_word(raw_sentence):
+    sen = []
+    pos = nlp.pos_tag(raw_sentence)
+    dep = nlp.dependency_parse(raw_sentence)
+    d_dep = [d for d in dep if d[0] == 'dep']
+    replacing_name = ""
+    equ = ""
+    last_period = 0
+    skip_nums = 0
+    judge_doubleEqu = 0
+    global Service_number, Equation_number
+    for token_index in range(len(pos)):
+        if skip_nums != 0:
+            temp = Equation_NameGroup[equ]
+            if skip_nums == 1:
+                sen.append('"')
+                #print(raw_sentence)
+            else:
+                Equation_NameGroup[equ] = temp + " " + pos[token_index][0]
+            skip_nums -= 1
+            continue
+            
+        if pos[token_index][0] == '.' and token_index != len(raw_sentence) - 1:
+            last_period = token_index + 1
+        #replace unique word
+        if not(pos[token_index][0].islower()) and not(pos[token_index][0][0].isupper()) and (is_JJ(pos[token_index][1])):
+            replacing_name = 'Service' + str(Service_number)
+            Service_number += 1
+            Service_NameGroup[replacing_name] = pos[token_index][0]
+            sen.append(replacing_name)
+            continue
+        #Replace elements in "" as equation
+        if token_index > 0 and pos[token_index-1][0] == '"' :
+            judge_doubleEqu += 1
+            if judge_doubleEqu%2 == 1:
+                if pos[token_index][0] == '"':
+                    equ = 'equation' + str(Equation_number) + '"'
+                    Equation_number += 1
+                    Equation_NameGroup[equ] = pos[token_index][0]
+                    sen.append(equ)
+                    continue
+                else:
+                    s_i = token_index
+                    while(s_i < len(pos)):
+                        if pos[s_i][0] == '"':
+                            skip_nums = s_i - token_index
+                            break
+                        s_i += 1
+                    equ = 'equation' + str(Equation_number)
+                    Equation_number += 1
+                    Equation_NameGroup[equ] = pos[token_index][0]
+                    sen.append(equ)
+                    continue
+        #Replace elements in {} as equation
+        if token_index > 0 and pos[token_index-1][0] == '{' :
+            if pos[token_index][0] == '}':
+                sen[-1] = '"'
+                equ = 'equation' + str(Equation_number) + '"'
+                Equation_number += 1
+                Equation_NameGroup[equ] = pos[token_index][0]
+                sen.append(equ)
+                continue
+            else:
+                sen[-1] = '"'
+                s_i = token_index
+                while(s_i < len(pos)):
+                    if pos[s_i][0] == '}':
+                        skip_nums = s_i - token_index
+                        break
+                    s_i += 1
+                equ = 'equation' + str(Equation_number)
+                Equation_number += 1
+                Equation_NameGroup[equ] = pos[token_index][0]
+                sen.append(equ)
+                continue
+            
+        #replace true to "true"
+        if pos[token_index][0].lower() == "true" or pos[token_index][0].lower() == "false":
+            replacing_name = '"' + pos[token_index][0] + '"'
+            sen.append(replacing_name)
+            continue
+        #replace output to return
+        if pos[token_index][0].lower() == 'output' and (pos[token_index+1][1] == 'DT' or pos[token_index+1][0] == '"' or pos[token_index+1][0] == '-1'):
+            replacing_name = 'return'
+            sen.append(replacing_name)
+            continue
+        #replace word
+        if len(d_dep)!=0 and is_Verb(pos[token_index][1]):
+            f = 0
+            for d in d_dep:
+                #replace tense
+                target_index = d[2] - d[1] + token_index
+                if d[1] == token_index + 1 - last_period and pos[target_index][0] == 'by':
+                    replacing_name = conjugate(verb=pos[token_index][0],tense=PAST)
+                    sen.append(replacing_name)
+                    f = 1
+                    #break
+                #replace , to . -> separate sentence
+                if d[2] == token_index + 1 - last_period and (is_Verb(pos[d[1] - 1 + last_period][1]) or pos[d[1] - 1 + last_period][0] == ','):
+                    if pos[token_index-1][0] == ',':
+                        sen[-1] = '.'
+                if d[1] == token_index + 1 - last_period and (is_Verb(pos[d[2] - 1 + last_period][1]) or pos[d[2] - 1 + last_period][0] == ','):
+                    if pos[token_index-1][0] == ',':
+                        sen[-1] = '.'
+            if f == 1:
+                continue
+        #add word to avoid ambiguity
+        #if len(d_dep)!=0 and is_NN(pos[token_index][1]):
+        #    f = 0
+        #    for d in d_dep:
+        #        #replace tense
+        #        target_index = d[2] - d[1] + token_index
+        #        if d[1] == token_index + 1 - last_period and is_NN(pos[target_index][1]):
+        #            if token_index < len(pos) - 1 and pos[token_index+1][0] == 'and':
+        #                replacing_name = pos[token_index][0] + ' ' + pos[target_index][0]
+        #               sen.append(replacing_name)
+        #                f = 1
+        #            #break
+        #    if f == 1:
+        #        continue
+        #replace ' to "    
+        if pos[token_index][0] == "'":
+            replacing_name = '"'
+            sen.append(replacing_name)
+            continue
+        #correct compound nouns
+        #if token_index < len(pos) - 1 and is_NN(pos[token_index][1]) and is_NN(pos[token_index+1][1]):
+        #    replacing_name = lemmatizer.lemmatize(pos[token_index][0], pos="n")
+        #    sen.append(replacing_name)
+        #    continue
+        #replace [i], [j]
+        if token_index > 0 and token_index < len(pos) - 1 and (pos[token_index][0] == 'i' or pos[token_index][0] == 'j') and (pos[token_index-1][0] == '[' and pos[token_index+1][0] == ']'):
+            replacing_name = sen[-1] + "_" + pos[token_index][0]
+            sen[-1] = replacing_name
+            continue
+        if pos[token_index][0] == '[' or pos[token_index][0] == ']':
+            continue
+        #replace if and only if
+        if pos[token_index][0] == 'and' and token_index - 1 >= 0 and token_index + 1 < len(pos) and pos[token_index-1][0] == 'if' and pos[token_index+1][0] == 'only':
+            sen.pop()
+            continue
+        #replace index i
+        if pos[token_index][0] == 'i' and token_index > 0 and is_NN(pos[token_index-1][1]):
+            #print(raw_sentence)
+            replacing_name = sen[-1] + "_" + pos[token_index][0]
+            sen[-1] = replacing_name
+            continue
+        #else:
+        mapping_name = Mapping.get(pos[token_index][0], "")
+        if mapping_name == "":
+            sen.append(pos[token_index][0])
+        else:
+            sen.append(mapping_name)
+    return (" ".join(sen)).strip()
+    
+
+def Read_Sentences(dir_path, filename = 'sentences'):
+    file = open(dir_path + filename, "r+")
+    sentence_group = []
+    x = file.readline()
+    while(x != ""):
+        sentence_group.append(replace_unique_word(SentencesProcessing(x)))
+        #sentence_group.append(SentencesProcessing(x))
+        x = file.readline()
+    file.close()
+    return sentence_group
+
+def POS(sentence):
+    return nlp.pos_tag(sentence)
+
+def DEP(sentence):
+    return nlp.dependency_parse(sentence)
+
+def tokenize(sentence):
+    return nlp.word_tokenize(sentence)
+
+#def is_input_keyword(token):
+#    return (token in input_relateword_sets)
+
+def is_input_keyword(token):
+    return (lemmatizer.lemmatize(token, pos="v").lower() in input_relateword_sets)
+
+def is_input_keyword_woGiven(token):
+    return (lemmatizer.lemmatize(token, pos="v").lower() in input_relateword_sets) and token.lower() != "given"
+
+def is_given(token):
+    if token == 'given':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'given')
+
+def is_input(token):
+    if token == 'input':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'input')
+
+def is_give(token):
+    if token == 'give':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'give')
+
+def is_provide(token):
+    if token == 'provide':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'provide')
+
+def is_receive(token):
+    if token == 'receive':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'receive')
+
+def is_take(token):
+    if token == 'take':
+        return True
+    return (lemmatizer.lemmatize(token, pos="v").lower() == 'take')
+
+
+def is_NN(pos):
+    if pos == 'NN' or pos == 'NNS' or pos =='NNP' or pos == 'NNPS':
+        return True
+    else:
+        return False
+    
+def is_Verb(pos):
+    if len(pos) < 2:
+        return False
+    if pos[0] == 'V' and pos[1] == 'B':
+        return True
+    else:
+        return False
+    
+def is_DT(pos):
+    if pos == 'DT':
+        return True
+    else:
+        return False
+    
+def is_JJ(pos):
+    if pos == 'JJ' or pos == 'JJR' or pos == 'JJS':
+        return True
+    else:
+        return False
+
+def is_prep(token):
+    if token == 'of' or token == 'for' or token =='from' or token == 'to':
+        return True
+    else:
+        return False
+    
+def is_of(token):
+    return token == 'of'
+
+def is_for(token):
+    return token == 'for'
+
+def is_from(token):
+    return token == 'from'
+
+def is_to(token):
+    return token == 'to'
+
+def is_cc(pos):
+    return pos == 'CC'
+
+def find_difference(anchor, target):
+    difference = []
+    for error in anchor:
+        if not(error in target):
+            difference.append(error)
+    return difference
+
+def is_uniqueWord(word):
+    word_len = len(word)
+    for i in range(word_len):
+        if i != 0 and word[i].isupper():
+            return 1
+    return 0
+
+N_gram = 1
+def word2features(sent, i, dep):
+    features = []
+    #Begin and end of sequence
+    if i == 0:
+        features.append('BOS')
+    if i == len(sent) - 1:
+        features.append('EOS')
+    
+    #Add bias
+    features.append('bias')
+    
+    #Add pos
+    features.append('pos=' + sent[i][1])
+    
+    #Dependency features
+    num_root = 0
+    last_period = 0
+    max_distance = 5
+    for d in dep:
+        #Constrain dep
+        if d[0] == 'punct' or d[0] == 'dep':
+            continue
+        
+        if d[0] == 'ROOT':
+            num_root +=1
+        while num_root > 1:
+            if last_period == len(sent):
+                print(sent)
+            if sent[last_period][1] == '.':
+                num_root -= 1
+            last_period += 1
+        
+        if last_period + d[1]-1 == i:                    
+            #if (not is_NN(sent[i][1])) and (not is_JJ(sent[i][1])) and (not is_DT(sent[i][1])):
+            #    continue
+            if d[2] > d[1]:
+                t_position = i + (d[2] - d[1])
+                distance = (d[2]-d[1])
+                #features.append('+' + str(d[2]-d[1]) + (':Dep=' + d[0]))
+                #features.append('+' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('+Dep=' + d[0]))
+                #features.append(('+target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('+max') + (':Dep=' + d[0]))
+                    features.append(('+max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('+' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('+' + str(distance)) + (':pos=' + sent[t_position][1]))
+                    
+                if is_input_keyword(sent[t_position][0]):
+                    #features.append('+' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    features.append(('+target_is_input_keyword = True'))
+            else:
+                t_position = i - (d[1] - d[2])
+                distance = (d[1]-d[2])
+                #features.append('-' + str(d[1]-d[2]) + (':Dep=' + d[0]))
+                #eatures.append('-' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('-Dep=' + d[0]))
+                #features.append(('-target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('-max') + (':Dep=' + d[0]))
+                    features.append(('-max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('-' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('-' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
+                if is_input_keyword(sent[t_position][0]):
+                    #features.append('-' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    features.append(('-target_is_input_keyword = True'))
+                
+        elif last_period + d[2]-1 == i:
+            #v2 constrain in
+            #if not is_NN(sent[last_period + d[1]-1][1]):
+            #    continue
+            #v1 constrain in
+            #if (not is_NN(sent[i][1])) and (not is_JJ(sent[i][1])) and (not is_DT(sent[i][1])): #and ((sent[i][1] != 'CD')):
+            #   continue
+            if d[2] > d[1]:
+                t_position = i - (d[2] - d[1])
+                distance = (d[2]-d[1])
+                #features.append('-' + str(d[2]-d[1]) + (':Dep=' + d[0]))
+                #features.append('-' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('-Dep=' + d[0]))
+                #features.append(('-target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('-max') + (':Dep=' + d[0]))
+                    features.append(('-max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('-' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('-' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
+                if is_input_keyword(sent[t_position][0]):
+                    #features.append('-' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    features.append(('-target_is_input_keyword = True'))
+            else:
+                t_position = i + (d[1] - d[2])
+                distance = (d[1]-d[2])
+                #features.append('+' + str(d[1]-d[2]) + (':Dep=' + d[0]))
+                #features.append('+' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('+Dep=' + d[0]))
+                #features.append(('+target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('+max') + (':Dep=' + d[0]))
+                    features.append(('+max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('+' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('+' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
+                if is_input_keyword(sent[t_position][0]):
+                    #features.append('+' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    features.append(('+target_is_input_keyword = True'))
+    
+    #Forward gram
+    for k in range(N_gram):
+        next_index = k + 1
+        if i + next_index > len(sent) - 1:
+            break
+        target_word = sent[i+next_index][0]
+        target_pos = sent[i+next_index][1]
+        f_next_pos = '+' + str(next_index) + (':pos=' + target_pos)
+        
+       
+        if is_input_keyword(target_word):
+            f_next_keyword = '+' + str(next_index) + (':is_input_keyword = True')
+            if f_next_keyword not in features:
+                features.append(f_next_keyword)
+        
+        if f_next_pos not in features:
+            features.append(f_next_pos)
+        #features.extend([
+            #'+' + str(next_index) + ':word=' + target_word,
+            #'+' + str(next_index) + (':word.islower={}'.format(target_word.islower())),
+            #'+' + str(next_index) + (':word.isupper={}'.format(target_word.isupper())),
+            #'+' + str(next_index) + ':pos=' + target_pos,
+            #'+' + str(next_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
+            #'+' + str(next_index) + (':word.is_prep={}'.format(is_prep(target_word))),
+        #])
+
+    #Backward gram
+    for k in range(N_gram):
+        previous_index = k + 1
+        if i - previous_index < 0:
+            break
+        target_word = sent[i-previous_index][0]
+        target_pos = sent[i-previous_index][1]
+        f_prev_pos = '-' + str(previous_index) + (':pos=' + target_pos)
+        
+        if is_input_keyword(target_word):
+            f_next_keyword = '-' + str(previous_index) + (':is_input_keyword = True')
+            if f_next_keyword not in features:
+                features.append(f_next_keyword)
+            
+        if f_prev_pos not in features:
+            features.append(f_prev_pos)
+        #features.extend([
+            #'-' + str(previous_index) + ':word=' + target_word,
+            #'-' + str(previous_index) + (':word.islower={}'.format(target_word.islower())),
+            #'-' + str(previous_index) + (':word.isupper={}'.format(target_word.isupper())),
+            #'-' + str(previous_index) + ':pos=' + target_pos,
+            #'-' + str(previous_index) + (':word.is_input_keyword={}'.format(is_input_keyword(target_word))),
+            #'-' + str(previous_index) + (':word.is_prep={}'.format(is_prep(target_word))),
+        #])
+    
+    #features = [
+        #'bias',
+        #'word=' + current_word,
+        #'word.islower={}'.format(current_word.islower()),
+        #'word.isupper={}'.format(current_word.isupper()),
+        #'word.is_input_keyword={}'.format(is_input_keyword(current_word)),
+        #'word.is_input_keyword={}'.format(is_input_keyword_woGiven(current_word)),
+        #'word.is_prep={}'.format(is_prep(current_word)),
+        #'pos=' + pos,
+        #'word.is_given={}'.format(is_given(current_word)),
+    #]
+   
+    
+    return features
+
+def sent2features(sent, dep):
+    return [word2features(sent, i, dep) for i in range(len(sent))]
+
+def convert_label_to_CRF_label(X, Y):
+    label_sequence = np.zeros(len(X))
+    i = 0
+    j = 0
+    flag = 0
+    start = -1
+    s_label = -1
+    e_label = -1
+    if len(Y) == 0:
+        return label_sequence
+    while i < len(X):
+        if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
+            flag = 1
+        if X[i] == Y[j]:
+            #if i != 0 and X[i] == 'color' and X[i-1] == ',':
+            #    i+=1
+            #    continue
+            #if i != 0 and X[i] == 'value' and X[i-1] == "'s":
+            #    i+=1
+            #    continue
+            #if i != 0 and X[i] == 'projects' and X[i-1] == "distinct":
+            #    i+=1
+            #    continue
+            start = i
+            s_label = j
+            k = j
+            while k < len(Y):
+                if Y[k] == ";" or Y[k] == ".":
+                    break
+                k += 1
+            e_label = k
+            if X[start:start + (e_label - s_label)] == Y[s_label:e_label]:
+                if flag == 1:
+                    label_sequence[start:start + (e_label - s_label)] = 1
+                    #print(start)
+                    #print(start + (e_label - s_label))
+                    flag = 0
+                    i = start + (e_label - s_label)
+                    j = e_label
+                else:
+                    while X[i] != ".":
+                        if i < len(X) - 1 and lemmatizer.lemmatize(X[i], pos="v").lower() != 'be' and lemmatizer.lemmatize(X[i+1], pos="v").lower() in input_relateword_sets:
+                            i+=1
+                            break
+                        if lemmatizer.lemmatize(X[i], pos="v").lower() in input_relateword_sets:
+                            label_sequence[start:start + (e_label - s_label)] = 1
+                            i = start + (e_label - s_label)
+                            j = e_label
+                            break
+                        i += 1
+            else:
+                i += 1
+        else:
+            i += 1
+        if j >= len(Y):
+            break
+        if Y[j] == ";" or Y[j] == ".":
+            if j == len(Y) - 1:
+                break
+            j += 1
+    return label_sequence
+
+def convert_int_to_str(array):
+    str_seq = [str(x) for x in array]
+    return str_seq
+
+def convert_CRF2Sen(sentence, y):
+    #tuple formation
+    for i in range(len(y)):
+        if y[i] == str(1.0) and (sentence[i] == ',' or sentence[i] == 'and'  or sentence[i] == 'provides'):
+            y[i] = str(0.0)
+    
+    
+    sen_group = []
+    sen = ""
+    for i in range(len(y)):
+        if y[i] == str(1.0):
+            sen += sentence[i] + " "
+        if i != len(y) - 1 and y[i] == str(1.0) and y[i+1] == str(0.0):
+            sen_group.append(sen[:-1])
+            sen = ""
+    return sen_group
+
+def find_sen_index(sent, dataset):
+    for index in range(len(dataset)):
+        if sent == dataset[index]:
+            return index
+    return -1
+
+def groundtruth2tuple(sent):
+    tokens = tokenize(sent)
+    tuple_element = []
+    temp = ""
+    for token in tokens:
+        if token == ';':
+            if temp != "":
+                tuple_element.append(temp[:-1])
+                temp = ""
+            continue
+        else:
+            temp+= token + ' '
+    if temp != "":
+        tuple_element.append(temp[:-1])
+    return tuple_element
+
+
+def CompareResult(prediction, answer):
+    total_sen = len(prediction)
+    total_elements = 0
+    sent_error = 0
+    element_error = 0
+    for i in range(total_sen):
+        flag = 0
+        total_elements += len(answer[i])
+        for element in prediction[i]:
+            if element not in answer[i]:
+                if flag == 0:
+                    print(i)
+                    sent_error += 1
+                    flag = 1
+                element_error += 1
+    return (total_sen-sent_error)/total_sen, (total_elements-element_error)/total_elements
+            
+            
+            
+
+
+raw_sentences = Read_Sentences(TrainDataPath, "sentences_test3_DT")
+label_sentences = Read_Sentences(TrainDataPath, "NN_I_test3_DT")
+train_x = [tokenize(sent) for sent in raw_sentences]
+train_y = [tokenize(sent) for sent in label_sentences]
+
+train_groundtruth = Read_Sentences(TrainDataPath, "NN_I_test3_DT_groundtruth")
+test_groundtruth = Read_Sentences(TestDataPath, "NN_I_DT_groundtruth")
+train_groundtruth = [groundtruth2tuple(sent) for sent in train_groundtruth]
+test_groundtruth = [groundtruth2tuple(sent) for sent in test_groundtruth]
+
+
+
+test_sentences = Read_Sentences(TestDataPath, "sentences_DT")
+test_label = Read_Sentences(TestDataPath, "NN_I_DT")
+test_x = [tokenize(sent) for sent in test_sentences]
+test_y = [tokenize(sent) for sent in test_label]
+testing_data = [POS(sent) for sent in test_sentences]
+testing_data_dep = [DEP(sent) for sent in test_sentences]
+X_test = [sent2features(sent, testing_data_dep[find_sen_index(sent, testing_data)]) for sent in testing_data]
+Y_test_integer = []
+for i in range(len(test_x)):
+    Y_test_integer.append(convert_label_to_CRF_label(test_x[i], test_y[i]))
+Y_test = [convert_int_to_str(seq) for seq in Y_test_integer]
+#label_sequence = convert_label_to_CRF_label(train_x[5], train_y[5])
+'''
+Y_train = []
+for i in range(len(train_x)):
+    print(i)
+    Y_train.append(convert_label_to_CRF_label(train_x[i], train_y[i]))
+'''
+
+training_data = [POS(sent) for sent in raw_sentences]
+training_data_dep = [DEP(sent) for sent in raw_sentences]
+training_label = [tokenize(sent) for sent in label_sentences]
+#print(training_data[0][0][0].isupper())
+X_train = [sent2features(sent, training_data_dep[find_sen_index(sent, training_data)]) for sent in training_data]
+#Y_train = training_label
+Y_train_integer = []
+for i in range(len(train_x)):
+    Y_train_integer.append(convert_label_to_CRF_label(train_x[i], train_y[i]))
+Y_train = [convert_int_to_str(seq) for seq in Y_train_integer]
+
+#Training
+'''
+model = pycrfsuite.Trainer(verbose=True)
+for xseq, yseq in zip(X_train, Y_train):
+    model.append(xseq, yseq)
+'''
+crf = sklearn_crfsuite.CRF(
+        c1 = 0,
+        c2 = 5e-2,
+        max_iterations = 200,
+        all_possible_transitions = True
+    )
+
+crf.fit(X_train, Y_train)
+
+train_prediction = crf.predict(X_train)
+Train_Correct = 0
+train_fault = []
+train_answer = []
+for i in range(len(X_train)):
+    if train_prediction[i] == Y_train[i]:
+        Train_Correct += 1
+    else:
+        train_fault.append(i)
+        
+for i in range(len(X_train)):
+    train_sen = convert_CRF2Sen(train_x[i], train_prediction[i])
+    train_answer.append(train_sen)
+
+print("Training Accuracy: " + str(Train_Correct/len(X_train)))
+
+prediction = crf.predict(X_test)
+Correct = 0
+fault = []
+answer = []
+for i in range(108):
+    if prediction[i] == Y_test[i]:
+        Correct += 1
+    else:
+        fault.append(i)
+        
+for i in range(108):
+    sen = convert_CRF2Sen(test_x[i], prediction[i])
+    answer.append(sen)
+
+
+amod_target_index = [10,18,20,30,41,47,55] # [10,18,30,47,55]
+Amod_error = [crf.predict_marginals_single(X_test[index]) for index in amod_target_index]
+amod_panswer = [answer[index] for index in amod_target_index]
+amod_answer = [test_y[index] for index in amod_target_index]
+
+NN_target_index = [1,40,63,70] # [1,40,63,70]
+NN_error = [crf.predict_marginals_single(X_test[index]) for index in NN_target_index]
+NN_panswer = [answer[index] for index in NN_target_index]
+NN_answer = [test_y[index] for index in NN_target_index]
+
+AUX_target_index = [69,76,89,91,98] # [69,76,89,91,98]
+AUX_error = [crf.predict_marginals_single(X_test[index]) for index in AUX_target_index]
+AUX_panswer = [answer[index] for index in AUX_target_index]
+AUX_answer = [test_y[index] for index in AUX_target_index]
+
+case_target_index = [67,105] # [67,105]
+case_error = [crf.predict_marginals_single(X_test[index]) for index in case_target_index]
+case_panswer = [answer[index] for index in case_target_index]
+case_answer = [test_y[index] for index in case_target_index]
+
+print("Testing Accuracy: " + str(Correct/108))
+'''
+model.set_params({
+        'c1': 1.0,
+        'c2': 1e-3,
+        'max_iterations': 200,
+        'feature.possible_transitions': True,
+        'feature.minfreq': 3
+    })
+model.train(model)
+#Testing
+tagger = pycrfsuite.Tagger()
+tagger.open(model)
+'''
+
+def fault_type(fault, prediction):
+    fault_error = []
+    for index in fault:
+        if prediction[index] == []:
+            fault_error.append(0)
+        else:
+            fault_error.append(1)
+    return fault_error
+
+def word_error(fault, prediction, answer):
+    word_err = []
+    for error in fault:
+        seq = answer[error]
+        p_seq = prediction[error]
+        total_word = len(seq)
+        error_word = 0
+        error_10 = 0
+        error_01 = 0
+        for index in range(len(seq)):
+            if seq[index] == '1.0' and p_seq[index] == '0.0':
+                error_word += 1
+                error_10 += 1
+            elif seq[index] == '0.0' and p_seq[index] == '1.0':
+                error_word += 1
+                error_01 += 1
+        word_err.append([error, error_01, error_10, error_word, total_word, (total_word-error_word)/total_word])
+    return word_err
+                
+
+
+t_fault_error = fault_type(train_fault, train_answer)
+fault_error = fault_type(fault, answer)
+
+state_features = crf.state_features_
+crffeatures = []
+for key, index in state_features.items():
+    crffeatures.append(key)
+    
+def feature_weight_extraction(X, Y, state_features, features):
+    weights = []
+    for word_index in range(len(X)):
+        word_weight = []
+        for feature in X[word_index]:
+            target_pair = (feature,Y[word_index])
+            if target_pair in features:
+                word_weight.append([target_pair,state_features[target_pair]])
+            else:
+                word_weight.append([target_pair,None])
+        weights.append(word_weight)
+    return weights
+
+def possible_feature_weight_extraction(X, state_features, features):
+    weights_0 = []
+    weights_1 = []
+    for word_index in range(len(X)):
+        word_weight_0 = []
+        word_weight_1 = []
+        for feature in X[word_index]:
+            target_pair_0 = (feature,'0.0')
+            target_pair_1 = (feature,'1.0')
+            if target_pair_0 in features:
+                word_weight_0.append([target_pair_0,state_features[target_pair_0]])
+            else:
+                word_weight_0.append([target_pair_0,None])
+            if target_pair_1 in features:
+                word_weight_1.append([target_pair_1,state_features[target_pair_1]])
+            else:
+                word_weight_1.append([target_pair_1,None])
+        weights_0.append(word_weight_0)
+        weights_1.append(word_weight_1)
+    return weights_0, weights_1
+
+train_feature_weights = []
+test_feature_weights = []
+prediction_train_feature_weights = []
+prediction_test_feature_weights = []
+
+weights_0 = []
+weights_1 = []
+
+train_weights_0 = []
+train_weights_1 = []
+
+for index in range(len(X_train)):
+    train_feature_weights.append(feature_weight_extraction(X_train[index], Y_train[index], state_features, crffeatures))
+    prediction_train_feature_weights.append(feature_weight_extraction(X_train[index], train_prediction[index], state_features, crffeatures))
+    temp_0, temp_1 = possible_feature_weight_extraction(X_train[index], state_features, crffeatures)
+    train_weights_0.append(temp_0)
+    train_weights_1.append(temp_1)
+    
+for index in range(len(X_test)):
+    test_feature_weights.append(feature_weight_extraction(X_test[index], Y_test[index], state_features, crffeatures))
+    prediction_test_feature_weights.append(feature_weight_extraction(X_test[index], prediction[index], state_features, crffeatures))
+    temp_0, temp_1 = possible_feature_weight_extraction(X_test[index], state_features, crffeatures)
+    weights_0.append(temp_0)
+    weights_1.append(temp_1)
+
+
+#Training Data Index (need to -1 for 0-index)
+receive_obj_NN = [1,3]
+provide_obj_NN = [2,4]
+take_obj_NN = [4,6,66]
+given_case_NN = [5,7,8,9,10,12,13,14,15,17,25,26,29,30,32,34,36,37,38,41,42,43,45,46,58,59,60,62,63,64]
+given_amod_NN = [11,19,20,33,39,48,49,56,57,61,65]
+inputNN_nsubj_NN = [16,35,54]
+areGiven_obj_NN = [18,22,24,31,47,53,55]
+NowGiven_obj_NN = [21]
+NowGiven_iobj_NN = [27,28]
+inputNN_nmod_NN = [23]
+isGiven_nsubjpass_NN = [40]
+given_mark_VB = [50]
+given_acl_NN = [51]
+given_obj_NN = [52]
+inputNN_compound_NN = []
+
+training_classification_result = (
+    receive_obj_NN,
+    provide_obj_NN,
+    take_obj_NN,
+    given_case_NN,
+    given_amod_NN,
+    inputNN_nsubj_NN,
+    areGiven_obj_NN,
+    NowGiven_obj_NN,
+    NowGiven_iobj_NN,
+    inputNN_nmod_NN,
+    isGiven_nsubjpass_NN,
+    given_mark_VB,
+    given_acl_NN,
+    given_obj_NN,
+    inputNN_compound_NN
+    )
+
+#Testing Data Index (need to -1 for 0-index)
+t_receive_obj_NN = []
+t_provide_obj_NN = []
+t_take_obj_NN = [18]
+t_given_case_NN = [3,6,7,9,10,13,17,20,23,26,27,30,34,36,38,40,43,44,45,46,50,53,60,61,62,68,73,83,
+                 86,87,88,89,93,94,97,98,104,106]
+t_given_amod_NN = [11,12,19,21,22,24,25,31,42,48,56,79,105]
+t_inputNN_nsubj_NN = []
+t_areGiven_obj_NN = [29,37,58,59,65,66,69,70,82,90,92,101,102,63]#63 were given
+t_NowGiven_obj_NN = []
+t_NowGiven_iobj_NN = []
+t_inputNN_nmod_NN = []
+t_isGiven_nsubjpass_NN = [77,99]
+t_given_mark_VB = []
+t_given_acl_NN = [81]
+t_given_obj_NN = []
+t_inputNN_compound_NN = [2,28,41,64,71]
+
+testing_classification_result = (
+    t_receive_obj_NN,
+    t_provide_obj_NN,
+    t_take_obj_NN,
+    t_given_case_NN,
+    t_given_amod_NN,
+    t_inputNN_nsubj_NN,
+    t_areGiven_obj_NN,
+    t_NowGiven_obj_NN,
+    t_NowGiven_iobj_NN,
+    t_inputNN_nmod_NN,
+    t_isGiven_nsubjpass_NN,
+    t_given_mark_VB,
+    t_given_acl_NN,
+    t_given_obj_NN,
+    t_inputNN_compound_NN
+    )
+
+def classify_error(fault, mode):
+    classification_result = []
+    if mode == 0:
+        flag = 0
+        for error in fault:
+            for index in range(len(training_classification_result)):
+                if (error + 1) in training_classification_result[index]:
+                    flag = 1
+                    classification_result.append(index)
+                    break
+            if flag == 0:
+                classification_result.append(15)
+            else:
+                flag = 0
+    else:
+        flag = 0
+        for error in fault:
+            for index in range(len(testing_classification_result)):
+                if (error+1) in testing_classification_result[index]:
+                    flag = 1
+                    classification_result.append(index)
+                    break
+            if flag == 0:
+                classification_result.append(15)
+            else:
+                flag = 0
+                
+    return classification_result
+
+cr = classify_error(fault, 1)
+t_cr = classify_error(train_fault, 0)
+
+classfication_index_pair = {
+    0:"receive_obj_NN",
+    1:"provide_obj_NN",
+    2:"take_obj_NN",
+    3:"given_case_NN",
+    4:"given_amod_NN",
+    5:"inputNN_nsubj_NN",
+    6:"areGiven_obj_NN",
+    7:"NowGiven_obj_NN",
+    8:"NowGiven_iobj_NN",
+    9:"inputNN_nmod_NN",
+    10:"isGiven_nsubjpass_NN",
+    11:"given_mark_VB",
+    12:"given_acl_NN",
+    13:"given_obj_NN",
+    14:"inputNN_compound_NN",
+    15:"No need output"
+    }
+
+empty_index_pair = {
+    0:"empty",
+    1:"Non-empty"
+    }
+
+def drawPie(classification_result, mode = 0):
+    cal_total_occurence = Counter(classification_result)
+    target = []
+    value = []
+    for key, val in cal_total_occurence.items():
+        if mode == 0:
+            target.append(classfication_index_pair[key])
+        else:
+            target.append(empty_index_pair[key])
+        value.append(val)
+    plt.pie(value, labels = target, autopct="%1.1f%%")
+    plt.axis('equal')
+    plt.show()
+    
+def drawBar(classification_result, mode = 0):
+    cal_total_occurence = Counter(classification_result)
+    target = []
+    value = []
+    for key, val in cal_total_occurence.items():
+        if mode == 0:
+            target.append(key)
+        else:
+            target.append(empty_index_pair[key])
+        value.append(val)
+    x = np.arange(len(target))
+    plt.bar(x, value)
+    plt.xticks(x, target)
+    plt.xlabel('Error type')
+    plt.ylabel('Number of errors')
+    #plt.title('Final Term')
+    plt.show()
+
+drawPie(t_cr,0)
+drawPie(t_fault_error,1)
+drawPie(cr,0)
+drawPie(fault_error,1)
+drawBar(t_cr,0)
+drawBar(t_fault_error,1)
+drawBar(cr,0)
+drawBar(fault_error,1)
+
+def find_meaning_weights(sen_feature, target_index, threshold = 0.5):
+    meaning_weights = []
+    target_sen = sen_feature[target_index]
+    for item in target_sen:
+        if item[1] == None:
+            meaning_weights.append(item)
+        elif abs(float(item[1])) >= threshold:
+            meaning_weights.append(item)
+    return meaning_weights
+
+#y_pred = crf.predict(X_train)
+#print(y_pred[0])
+
+
+nlp.close()

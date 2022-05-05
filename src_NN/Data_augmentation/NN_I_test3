@@ -2,8 +2,8 @@ destCity and DateTime entities
 book title and author, credit card information and the address that the book will be shipped to
 destCity, ArrivalDateTime, and departDateTime
 picture of a barcode of a product and provides his current local position
-PatientID and DeviceAddress; Organisation; blood pressure; level of warning; warning level
-patient ID; Patient ID; patient ID; treatment ID; medication ID;
+PatientID and DeviceAddress; ; blood pressure; level of Warning; Warning level
+patient ID; patient ID; patient ID; treatment ID; medication ID;
 hotel name, city, and state information
 zip code and food preference
 current location and food preference

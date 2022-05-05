@@ -1,0 +1,66 @@
+the destCity and DateTime entities
+a book title and author, credit card information and the address that the book will be shipped to
+destCity, ArrivalDateTime, and departDateTime
+a picture of a barcode of a product and provides his current local position
+his PatientID and DeviceAddress; ; a blood pressure; a level of Warning; a Warning level
+a patient ID; a patient ID; a patient ID; a treatment ID; a medication ID;
+the hotel name, city, and state information
+the zip code and food preference
+the current location and food preference
+the start and destination addresses
+node
+a string input representing the file system in the explained format
+an integer array of digits ; digits
+a sequence of words written in the alien language , and the order of the alphabet ; words
+A and B ; input
+the string p
+an integer N
+the locations and height of all the buildings as shown on a cityscape photo
+array
+program
+the employee information of a company and an employee id
+a string expression representing a Lisp-like expression
+two 1s
+an integer array nums
+a chemical formula
+a string s ; string
+two positive integers L and R
+array
+the Teemo's attacking ascending time series towards Ashe and the poisoning time duration per Teemo's attacking
+a square at location in the grid and a color ; color
+a string s
+a list of unique words ; list
+equation
+an integer array destination and an integer k
+a list of strings
+an input array nums
+the total number of courses numCourses and a list of the prerequisite pairs
+an integer array arr and a target value target ; array
+node ; node
+A string S of lowercase English letters
+a list of daily temperatures T
+the root node of a binary search tree and a value ; value
+an expression such as expression = " e + 8-a + 5 " and an evaluation map
+
+all the cities and flights , together with starting city src and the destination dst
+string arrays queries and words
+several projects
+projects
+parameters
+you can eliminate at most k obstacles
+certain items
+a string s
+the arrays of startTime , endTime and profit
+several matchsticks the girl has , represented with their stick length
+two non-empty linked lists representing two non-negative integers
+number N in base-10
+list mines
+a string representing n
+an array consisting of n integers ; length k that has the maximum average value
+an array of integers with possible duplicates ; target number ; target number
+a printNumber method to output an integer ; program
+the root of a Binary Search Tree and a target number k ; target
+the next click position among all the unrevealed squares
+an expression representing a set of words under the given grammar
+2D-array
+a string s

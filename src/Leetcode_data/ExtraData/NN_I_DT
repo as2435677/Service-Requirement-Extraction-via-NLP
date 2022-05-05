@@ -1,0 +1,145 @@
+
+arrays
+two non-negative integers num1 and num2 represented as string
+
+
+an integer array nums
+an N x N grid containing only values 0 and 1
+
+an integer number n
+a m * n matrix mat and an integer K
+tree
+array
+a list of three points in the plane
+
+
+
+the integer array cardPoints and the integer k
+the fork on their right or the one on their left as they become available
+timestamp
+the integer n representing the number of courses at some university labeled from 1 to n , and the array dependencies where dependencies [ i ] = [ x i , y i ] represents a prerequisite relationship ; the integer k
+num
+sequence of books
+a list of queries , and a pattern
+binary tree
+string
+an initial computer network connections
+two arrays of integers nums1 and nums2
+2D-array
+the list G
+an array of integers A sorted in non-decreasing order
+tree
+
+
+an integer array nums 
+
+an input string ( s ) and a pattern ( p )
+an array of variable pairs equations and an array of real numbers values
+a list of words
+
+a positive integer num
+array ; array
+rules
+a non-negative integer n which represents the number of LEDs that are currently on
+a matrix of M x N elements
+the integer n and the array roads
+a set of pairs ; pairs
+
+node
+
+a binary tree
+
+
+two anagrams A and B
+a lower and upper number bound
+
+bucket
+
+a 2D char matrix representing the game board
+string S ; an array widths
+the head of a linked list
+a VPS represented as string s
+an integer array A , and an integer target
+a root node
+array
+an array of distinct positive integers locations where locations [ i ] represents the position of city i ; integers start , finish and fuel representing the starting city , ending city , and the initial amount of fuel you have
+heights , a 2D array of size rows x columns
+
+the following tree
+K eggs
+a real file system
+board
+
+a range [ m , n ]
+
+
+array nums
+The list of their ages
+
+matrix
+
+the order
+an array of distinct integers arr and an array of integer arrays pieces
+the array nums
+
+
+a tree ( ie a connected , undirected graph that has no cycles ) consisting of n nodes numbered from 0 to n-1 and exactly n-1 edges ; string labels
+two arrays of integers with equal lengths
+a N * N matrix M representing the friend relationship between students in the class
+an integer n
+a target value
+
+a rows x cols matrix grid
+an string s
+an m x n 2d grid map of' 1' s ( land ) and' 0' s
+
+
+the starting string start and the ending string end
+a root node reference of a BST and a key ; key
+A mapping of digit to letters
+all courses ; all courses in some way
+an array of network towers towers and an integer radius
+a string s of even length consisting of digits from 0 to 9 , and two integers a and b
+
+a non-empty binary tree
+array
+n
+
+
+points
+sample
+
+13
+Score of letters
+n + 1 candies to the first person , n + 2 candies to the second person , and so on until we give 2 * n candies to the last person
+
+root of a binary tree
+bounds
+
+
+binary tree
+
+mails
+
+
+array
+
+
+integer maxCost
+r and c are all positive
+array
+The number of slots for each parking space
+
+
+undirected graph
+above Logs table
+numbers
+numbers
+
+list
+
+directed graph
+discount equivalent to prices
+N
+2D binary array A
+strings consist of lowercase English characters only
