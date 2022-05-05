@@ -360,6 +360,7 @@ def word2features(sent, i, dep):
     #Dependency features
     num_root = 0
     last_period = 0
+    max_distance = 5
     for d in dep:
         #Constrain dep
         if d[0] == 'punct' or d[0] == 'dep':
@@ -379,16 +380,42 @@ def word2features(sent, i, dep):
             #    continue
             if d[2] > d[1]:
                 t_position = i + (d[2] - d[1])
-                features.append('+' + str(d[2]-d[1]) + (':Dep=' + d[0]))
-                features.append('+' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                distance = (d[2]-d[1])
+                #features.append('+' + str(d[2]-d[1]) + (':Dep=' + d[0]))
+                #features.append('+' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('+Dep=' + d[0]))
+                #features.append(('+target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('+max') + (':Dep=' + d[0]))
+                    features.append(('+max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('+' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('+' + str(distance)) + (':pos=' + sent[t_position][1]))
+                    
                 if is_input_keyword(sent[t_position][0]):
-                    features.append('+' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    #features.append('+' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    features.append(('+target_is_input_keyword = True'))
             else:
                 t_position = i - (d[1] - d[2])
-                features.append('-' + str(d[1]-d[2]) + (':Dep=' + d[0]))
-                features.append('-' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                distance = (d[1]-d[2])
+                #features.append('-' + str(d[1]-d[2]) + (':Dep=' + d[0]))
+                #eatures.append('-' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('-Dep=' + d[0]))
+                #features.append(('-target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('-max') + (':Dep=' + d[0]))
+                    features.append(('-max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('-' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('-' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
                 if is_input_keyword(sent[t_position][0]):
-                    features.append('-' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    #features.append('-' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    features.append(('-target_is_input_keyword = True'))
                 
         elif last_period + d[2]-1 == i:
             #v2 constrain in
@@ -399,16 +426,42 @@ def word2features(sent, i, dep):
             #   continue
             if d[2] > d[1]:
                 t_position = i - (d[2] - d[1])
-                features.append('-' + str(d[2]-d[1]) + (':Dep=' + d[0]))
-                features.append('-' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                distance = (d[2]-d[1])
+                #features.append('-' + str(d[2]-d[1]) + (':Dep=' + d[0]))
+                #features.append('-' + str(d[2]-d[1]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('-Dep=' + d[0]))
+                #features.append(('-target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('-max') + (':Dep=' + d[0]))
+                    features.append(('-max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('-' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('-' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
                 if is_input_keyword(sent[t_position][0]):
-                    features.append('-' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    #features.append('-' + str(d[2]-d[1]) + (':is_input_keyword = True'))
+                    features.append(('-target_is_input_keyword = True'))
             else:
                 t_position = i + (d[1] - d[2])
-                features.append('+' + str(d[1]-d[2]) + (':Dep=' + d[0]))
-                features.append('+' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                distance = (d[1]-d[2])
+                #features.append('+' + str(d[1]-d[2]) + (':Dep=' + d[0]))
+                #features.append('+' + str(d[1]-d[2]) + (':pos=' + sent[t_position][1]))
+                
+                #features.append(('+Dep=' + d[0]))
+                #features.append(('+target_pos=' + sent[t_position][1]))
+                
+                if distance > max_distance:
+                    features.append(('+max') + (':Dep=' + d[0]))
+                    features.append(('+max') + (':pos=' + sent[t_position][1]))
+                else:
+                    features.append(('+' + str(distance)) + (':Dep=' + d[0]))
+                    features.append(('+' + str(distance)) + (':pos=' + sent[t_position][1]))
+                
                 if is_input_keyword(sent[t_position][0]):
-                    features.append('+' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    #features.append('+' + str(d[1]-d[2]) + (':is_input_keyword = True'))
+                    features.append(('+target_is_input_keyword = True'))
     
     #Forward gram
     for k in range(N_gram):
@@ -418,6 +471,13 @@ def word2features(sent, i, dep):
         target_word = sent[i+next_index][0]
         target_pos = sent[i+next_index][1]
         f_next_pos = '+' + str(next_index) + (':pos=' + target_pos)
+        
+       
+        if is_input_keyword(target_word):
+            f_next_keyword = '+' + str(next_index) + (':is_input_keyword = True')
+            if f_next_keyword not in features:
+                features.append(f_next_keyword)
+        
         if f_next_pos not in features:
             features.append(f_next_pos)
         #features.extend([
@@ -437,6 +497,12 @@ def word2features(sent, i, dep):
         target_word = sent[i-previous_index][0]
         target_pos = sent[i-previous_index][1]
         f_prev_pos = '-' + str(previous_index) + (':pos=' + target_pos)
+        
+        if is_input_keyword(target_word):
+            f_next_keyword = '-' + str(previous_index) + (':is_input_keyword = True')
+            if f_next_keyword not in features:
+                features.append(f_next_keyword)
+            
         if f_prev_pos not in features:
             features.append(f_prev_pos)
         #features.extend([
@@ -533,13 +599,19 @@ def convert_int_to_str(array):
     return str_seq
 
 def convert_CRF2Sen(sentence, y):
+    #tuple formation
+    for i in range(len(y)):
+        if y[i] == str(1.0) and (sentence[i] == ',' or sentence[i] == 'and'  or sentence[i] == 'provides'):
+            y[i] = str(0.0)
+    
+    
     sen_group = []
     sen = ""
     for i in range(len(y)):
         if y[i] == str(1.0):
             sen += sentence[i] + " "
         if i != len(y) - 1 and y[i] == str(1.0) and y[i+1] == str(0.0):
-            sen_group.append(sen)
+            sen_group.append(sen[:-1])
             sen = ""
     return sen_group
 
@@ -549,10 +621,54 @@ def find_sen_index(sent, dataset):
             return index
     return -1
 
+def groundtruth2tuple(sent):
+    tokens = tokenize(sent)
+    tuple_element = []
+    temp = ""
+    for token in tokens:
+        if token == ';':
+            if temp != "":
+                tuple_element.append(temp[:-1])
+                temp = ""
+            continue
+        else:
+            temp+= token + ' '
+    if temp != "":
+        tuple_element.append(temp[:-1])
+    return tuple_element
+
+
+def CompareResult(prediction, answer):
+    total_sen = len(prediction)
+    total_elements = 0
+    sent_error = 0
+    element_error = 0
+    for i in range(total_sen):
+        flag = 0
+        total_elements += len(answer[i])
+        for element in prediction[i]:
+            if element not in answer[i]:
+                if flag == 0:
+                    print(i)
+                    sent_error += 1
+                    flag = 1
+                element_error += 1
+    return (total_sen-sent_error)/total_sen, (total_elements-element_error)/total_elements
+            
+            
+            
+
+
 raw_sentences = Read_Sentences(TrainDataPath, "sentences_test3_DT")
 label_sentences = Read_Sentences(TrainDataPath, "NN_I_test3_DT")
 train_x = [tokenize(sent) for sent in raw_sentences]
 train_y = [tokenize(sent) for sent in label_sentences]
+
+train_groundtruth = Read_Sentences(TrainDataPath, "NN_I_test3_DT_groundtruth")
+test_groundtruth = Read_Sentences(TestDataPath, "NN_I_DT_groundtruth")
+train_groundtruth = [groundtruth2tuple(sent) for sent in train_groundtruth]
+test_groundtruth = [groundtruth2tuple(sent) for sent in test_groundtruth]
+
 
 
 test_sentences = Read_Sentences(TestDataPath, "sentences_DT")
@@ -669,7 +785,7 @@ tagger.open(model)
 def fault_type(fault, prediction):
     fault_error = []
     for index in fault:
-        if prediction[index] == "":
+        if prediction[index] == []:
             fault_error.append(0)
         else:
             fault_error.append(1)

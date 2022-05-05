@@ -73,7 +73,7 @@ board
 a range [ m , n ]
 
 
-
+array nums
 The list of their ages
 
 matrix
@@ -87,7 +87,7 @@ a tree ( ie a connected , undirected graph that has no cycles ) consisting of n 
 two arrays of integers with equal lengths
 a N * N matrix M representing the friend relationship between students in the class
 an integer n
-a target value to search
+a target value
 
 a rows x cols matrix grid
 an string s
@@ -97,7 +97,7 @@ an m x n 2d grid map of' 1' s ( land ) and' 0' s
 the starting string start and the ending string end
 a root node reference of a BST and a key ; key
 A mapping of digit to letters
-
+all courses ; all courses in some way
 an array of network towers towers and an integer radius
 a string s of even length consisting of digits from 0 to 9 , and two integers a and b
 

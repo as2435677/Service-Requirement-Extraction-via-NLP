@@ -18,7 +18,7 @@ an integer N
 the locations and height of all the buildings as shown on a cityscape photo
 array
 program
-the employee information of a company , and an employee id
+the employee information of a company and an employee id
 a string expression representing a Lisp-like expression
 two 1s
 an integer array nums
@@ -36,10 +36,10 @@ a list of strings
 an input array nums
 the total number of courses numCourses and a list of the prerequisite pairs
 an integer array arr and a target value target ; array
-node . node
+node ; node
 A string S of lowercase English letters
 a list of daily temperatures T
-the root node of a binary search tree and a value . value
+the root node of a binary search tree and a value ; value
 an expression such as expression = " e + 8-a + 5 " and an evaluation map
 
 all the cities and flights , together with starting city src and the destination dst
@@ -50,14 +50,14 @@ parameters
 you can eliminate at most k obstacles
 certain items
 a string s
-startTime , endTime and profit arrays
+the arrays of startTime , endTime and profit
 several matchsticks the girl has , represented with their stick length
 two non-empty linked lists representing two non-negative integers
 number N in base-10
 list mines
 a string representing n
 an array consisting of n integers ; length k that has the maximum average value
-an array of integers with possible duplicates ; target number
+an array of integers with possible duplicates ; target number ; target number
 a printNumber method to output an integer ; program
 the root of a Binary Search Tree and a target number k ; target
 the next click position among all the unrevealed squares
