@@ -38,7 +38,7 @@ sentence_group = ["Request1 specifies a request for compositions that receives t
        "The total price of the composite service execution should be at most $500."
        ]
 '''
-
+#Compare result of prediction and groundtruth
 def CompareResult(prediction, answer):
     total_sen = len(prediction)
     total_elements = 0
@@ -55,7 +55,7 @@ def CompareResult(prediction, answer):
                     flag = 1
                 element_error += 1
     return (total_sen-sent_error)/total_sen, (total_elements-element_error)/total_elements
-
+#Process the special tokens
 def SentencesProcessing(raw_sentences):
     #new_sentences = raw_sentences.lower()
     new_sentences = re.sub(r'\([^)]*\)', '', raw_sentences)
@@ -154,7 +154,7 @@ def recover_sentence(tokens):
                 continue
             sen = sen + ' ' + token
     return sen
-
+#Recover coreference words
 def de_coreference(sen, tokens):
     #print(sen)
     coref_information = nlp.coref(sen)
@@ -449,7 +449,7 @@ def find_conj_words(token_index, dep_parse, tokens, pos_tag, keywords):
     for index in words_index:
         #keywords.append(recover_compound(index, dep_parse, tokens, pos_tag))
         find_of_information(index, dep_parse, tokens, pos_tag, keywords)
-    
+#check dependency 
 def Check_Case_in(token_index, dep_parse, tokens):
     for dep in dep_parse:
         if dep[0] == 'case' and dep[1] == token_index:
@@ -458,7 +458,7 @@ def Check_Case_in(token_index, dep_parse, tokens):
             else:
                 return 0
     return 0
-
+#check dependency 
 def Check_Case_of(token_index, dep_parse, tokens):
     for dep in dep_parse:
         if dep[0] == 'case' and dep[1] == token_index:
@@ -930,7 +930,7 @@ def check_used_conjwords(token_index, tokens, relate_dep):
 
 
 #output_modisen = open("./mod_sentence", "w")
-
+#Process sentences using rule-based extraction
 for sen_index in range(len(sentence_group)):
     sen = sentence_group[sen_index]
     print("-----------Original sentence-----------\n" + sen + "\n ------------------------------------ \n")
@@ -976,7 +976,7 @@ for sen_index in range(len(sentence_group)):
                 bracket_flag = 0
             if bracket_flag:
                 continue
-            
+            #Find keyword and process
             if (lemmatizer.lemmatize(tokens[token_index], pos="v")).lower() in input_relateword_sets and pos_tag[token_index][1] != 'NNS':
                 input_relate_dep = find_keyword_relate_dep(token_index, dep_parse, tokens)
                 if check_used_conjwords(token_index, tokens, dep_parse):
@@ -1040,7 +1040,8 @@ for sen_index in range(len(sentence_group)):
     #    break
     I = []
     O = []
-    
+
+#Using this to compare result by using CompareResult
 new_I_group = []
 for item in I_group:
     temp = []
@@ -1048,7 +1049,7 @@ for item in I_group:
         for t in tuples:
             temp.append(t)
     new_I_group.append(temp)    
-
+#Using this to compare result by using CompareResult
 new_O_group = []
 for item in O_group:
     temp = []

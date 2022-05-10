@@ -52,7 +52,7 @@ Mapping = {
     #'}': '"'
     
     }
-
+#Process some special tokens
 def SentencesProcessing(raw_sentences):
     #new_sentences = raw_sentences.lower()
     new_sentences = re.sub(r'\([^)]*\)', '', raw_sentences)
@@ -64,7 +64,7 @@ def SentencesProcessing(raw_sentences):
     for i in new_sentences.split():
         long_words.append(i)   
     return (" ".join(long_words)).strip()
-
+#Replace token to make performance better
 def replace_unique_word(raw_sentence):
     sen = []
     pos = nlp.pos_tag(raw_sentence)
@@ -341,7 +341,7 @@ def is_uniqueWord(word):
         if i != 0 and word[i].isupper():
             return 1
     return 0
-
+#Setting for number of gram
 N_gram = 1
 def word2features(sent, i, dep):
     features = []
@@ -365,7 +365,7 @@ def word2features(sent, i, dep):
         #Constrain dep
         if d[0] == 'punct' or d[0] == 'dep':
             continue
-        
+        #Fix dependency parser index
         if d[0] == 'ROOT':
             num_root +=1
         while num_root > 1:
@@ -374,7 +374,7 @@ def word2features(sent, i, dep):
             if sent[last_period][1] == '.':
                 num_root -= 1
             last_period += 1
-        
+        #Add dependency
         if last_period + d[1]-1 == i:                    
             #if (not is_NN(sent[i][1])) and (not is_JJ(sent[i][1])) and (not is_DT(sent[i][1])):
             #    continue
@@ -528,10 +528,10 @@ def word2features(sent, i, dep):
    
     
     return features
-
+#transform sentence to features
 def sent2features(sent, dep):
     return [word2features(sent, i, dep) for i in range(len(sent))]
-
+#convert label(text) to CRF label(0,1)
 def convert_label_to_CRF_label(X, Y):
     label_sequence = np.zeros(len(X))
     i = 0
@@ -597,7 +597,7 @@ def convert_label_to_CRF_label(X, Y):
 def convert_int_to_str(array):
     str_seq = [str(x) for x in array]
     return str_seq
-
+#Convert CRF label to text label
 def convert_CRF2Sen(sentence, y):
     #tuple formation
     for i in range(len(y)):
@@ -614,13 +614,13 @@ def convert_CRF2Sen(sentence, y):
             sen_group.append(sen[:-1])
             sen = ""
     return sen_group
-
+#find sentence index in data
 def find_sen_index(sent, dataset):
     for index in range(len(dataset)):
         if sent == dataset[index]:
             return index
     return -1
-
+#groundtruth data to tuple format
 def groundtruth2tuple(sent):
     tokens = tokenize(sent)
     tuple_element = []
@@ -637,7 +637,7 @@ def groundtruth2tuple(sent):
         tuple_element.append(temp[:-1])
     return tuple_element
 
-
+#Compare result between prediction and groundtruth
 def CompareResult(prediction, answer):
     total_sen = len(prediction)
     total_elements = 0
@@ -657,7 +657,7 @@ def CompareResult(prediction, answer):
             
             
             
-
+#data preparation
 
 raw_sentences = Read_Sentences(TrainDataPath, "sentences_test3_DT")
 label_sentences = Read_Sentences(TrainDataPath, "NN_I_test3_DT")
@@ -707,6 +707,8 @@ model = pycrfsuite.Trainer(verbose=True)
 for xseq, yseq in zip(X_train, Y_train):
     model.append(xseq, yseq)
 '''
+
+#Training
 crf = sklearn_crfsuite.CRF(
         c1 = 0,
         c2 = 5e-2,
@@ -731,7 +733,7 @@ for i in range(len(X_train)):
     train_answer.append(train_sen)
 
 print("Training Accuracy: " + str(Train_Correct/len(X_train)))
-
+#Testing
 prediction = crf.predict(X_test)
 Correct = 0
 fault = []
@@ -746,7 +748,7 @@ for i in range(108):
     sen = convert_CRF2Sen(test_x[i], prediction[i])
     answer.append(sen)
 
-
+#Error classification
 amod_target_index = [10,18,20,30,41,47,55] # [10,18,30,47,55]
 Amod_error = [crf.predict_marginals_single(X_test[index]) for index in amod_target_index]
 amod_panswer = [answer[index] for index in amod_target_index]
@@ -781,7 +783,7 @@ model.train(model)
 tagger = pycrfsuite.Tagger()
 tagger.open(model)
 '''
-
+#Check empty or non-empty
 def fault_type(fault, prediction):
     fault_error = []
     for index in fault:
@@ -790,7 +792,7 @@ def fault_type(fault, prediction):
         else:
             fault_error.append(1)
     return fault_error
-
+#Check token error rate
 def word_error(fault, prediction, answer):
     word_err = []
     for error in fault:
@@ -819,7 +821,7 @@ state_features = crf.state_features_
 crffeatures = []
 for key, index in state_features.items():
     crffeatures.append(key)
-    
+#Extract features weights
 def feature_weight_extraction(X, Y, state_features, features):
     weights = []
     for word_index in range(len(X)):
@@ -950,7 +952,7 @@ testing_classification_result = (
     t_given_obj_NN,
     t_inputNN_compound_NN
     )
-
+#classify different categories of error
 def classify_error(fault, mode):
     classification_result = []
     if mode == 0:
@@ -1047,7 +1049,7 @@ drawBar(t_cr,0)
 drawBar(t_fault_error,1)
 drawBar(cr,0)
 drawBar(fault_error,1)
-
+#find feature weights that larger than threshold
 def find_meaning_weights(sen_feature, target_index, threshold = 0.5):
     meaning_weights = []
     target_sen = sen_feature[target_index]

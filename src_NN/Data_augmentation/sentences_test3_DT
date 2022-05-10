@@ -11,7 +11,7 @@ Given the start and destination addresses, findDirection returns a detailed step
  Implement the function getKthAncestor ( int node , int k ) to return the k-th ancestor of the given node . If there is no such ancestor , return -1 .
  Given a string input representing the file system in the explained format , return the length of the longest absolute path to a file in the abstracted file system . If there is no file in the system , return 0 .
  Given an integer array of digits , return the largest multiple of three that can be formed by concatenating some of the given digits in any order .
- Given a sequence of words written in the alien language  and the order of the alphabet , return true if and only if the given words are sorted lexicographicaly in this alien language .
+ Given a sequence of words written in the alien language , and the order of the alphabet , return true if and only if the given words are sorted lexicographicaly in this alien language .
  Given A and B , return the minimum number of swaps to make both sequences strictly increasing . It is guaranteed that the given input always makes it possible .
  Now we have another string p . Your job is to find out how many unique non-empty substrings of p are present in s . In particular , your input is the string p and you need to output the number of different non-empty substrings of p in the string s .
  Given an integer N as input , return the number of' 1's in the first N number in the magical string S .
